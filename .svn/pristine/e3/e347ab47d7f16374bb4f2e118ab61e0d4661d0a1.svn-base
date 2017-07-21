@@ -1,0 +1,213 @@
+package com.zenchn.electrombile.api;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
+import com.zenchn.electrombile.api.callback.GpsLink;
+import com.zenchn.electrombile.base.BaseApi;
+import com.zenchn.electrombile.entity.CommandModel;
+import com.zenchn.electrombile.kit.LogKit;
+import com.zenchn.electrombile.kit.RetrofitKit;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * 作    者：wangr on 2017/3/4 14:49
+ * 描    述：
+ * 修订记录：
+ */
+public class TcpCmdApi extends BaseApi {
+
+    private TcpCmdApi() {
+    }
+
+    public static TcpCmdApi getInstance() {
+        return new TcpCmdApi();
+    }
+
+    /**
+     * 获取波导token
+     *
+     * @param url
+     * @param username
+     * @param password
+     * @param grant_type
+     * @param single
+     */
+    public void getGpsLinkToken(String url, final String username, String password, String grant_type, String single, final GpsLink.GetTokenCallback callback) {
+
+        mApiStore
+                .getGpsLinkToken(url, username, password, grant_type, single)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+
+                        try {
+
+                            if (response.code() == 200) {
+
+                                JSONObject jsonResult = JSON.parseObject(response.body());
+                                String token_type = jsonResult.getString("token_type");
+                                String access_token = jsonResult.getString("access_token");
+                                String authorization = token_type + " " + access_token;
+                                callback.onGetTokenSuccess(authorization);
+
+                                LogKit.success(username + "  设备token获取成功", "token ：" + authorization);
+
+                            }  else {
+
+                                LogKit.success(username + " 设备token获取失败", "失败原因：\n" + "未知错误");
+                                callback.onGetTokenFailure();
+                            }
+
+                        } catch (Exception e) {
+                            callback.onGetTokenFailure();
+                            LogKit.exception(username + "  设备token获取失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        LogKit.exception(username + "  设备token获取失败", "访问失败, 异常信息：\n" + t.toString());
+                        callback.onGetTokenFailure();
+                    }
+                });
+    }
+
+    /**
+     * 发送控车指令
+     *
+     * @param url
+     * @param authorization
+     * @param cid
+     * @param commandModel
+     */
+    public void postTcpCmd(String url, String authorization, String cid, CommandModel commandModel, GpsLink.SendTcpCmdCallback callback) {
+        postTcpCmd(url, authorization, cid, convertTcpCmdBody(commandModel), callback);
+    }
+
+    /**
+     * 构建一个指令请求体
+     *
+     * @param commandModel
+     * @return
+     */
+    private RequestBody convertTcpCmdBody(CommandModel commandModel) {
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("command", commandModel.getCommand());
+        jsonObject.put("parameter", commandModel.getParameter());
+        jsonObject.put("comtype", commandModel.getComtype());
+        jsonObject.put("remarks", commandModel.getRemarks());
+        jsonObject.put("clientid", commandModel.getClientid());
+        return RetrofitKit.createRequestBody(jsonObject);
+
+    }
+
+    /**
+     * 发送控车指令
+     *
+     * @param url
+     * @param authorization
+     * @param cid
+     * @param body
+     */
+    private void postTcpCmd(String url, final String authorization, String cid, RequestBody body, final GpsLink.SendTcpCmdCallback callback) {
+
+        mApiStore
+                .postTcpCmd(url, authorization, cid, body)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+
+                            if (response.code() == 200 || response.code() == 201) {
+
+                                JSONObject jsonResult = (JSONObject) JSON.parse(response.body());
+                                String id = jsonResult.getString("id");
+
+                                callback.onSendTcpCmdSuccess(id);
+                                LogKit.success("指令发送成功", "id ：" + id);
+
+                            } else if (response.code() == 401) {
+
+                                callback.onTokenRefuse();
+                                LogKit.success("指令发送失败", "失败原因：\n" + "未知错误");
+
+                            } else {
+                                JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                LogKit.success("指令发送失败", "失败原因：" + errorResult.getString("error"));
+                                callback.onSendTcpCmdFailure();
+                            }
+
+                        } catch (Exception e) {
+                            callback.onSendTcpCmdFailure();
+                            LogKit.exception("指令发送失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        callback.onSendTcpCmdFailure();
+                        LogKit.exception("指令发送失败", "访问失败, 异常信息：\n" + t.toString());
+                    }
+                });
+    }
+
+    /**
+     * 查询控车指令
+     *
+     * @param url
+     * @param authorization
+     * @param id
+     */
+    public void queryTcpCmd(String url, String authorization, String id, final GpsLink.QueryTcpCmdCallback callback) {
+
+        mApiStore
+                .queryTcpCmd(url, authorization, id)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+
+                            if (response.code() == 200) {
+
+                                JSONObject jsonResult = (JSONObject) JSON.parse(response.body());
+                                String returnMsg = jsonResult.getString("returnmsg");
+
+                                callback.onQueryTcpCmdSuccess(returnMsg);
+                                LogKit.success("指令查询成功", "msg ：" + returnMsg);
+
+                            } else if (response.code() == 401) {
+
+                                callback.onTokenRefuse();
+                                LogKit.success("指令查询失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                            }else if (response.code() == 429) {
+
+                                callback.onQueryTcpCmdLimited();
+                                LogKit.success("指令查询失败", "失败原因：\n" + "接口访问太频繁：超过4次/秒或者120次/分钟");
+
+                            } else {
+
+                                LogKit.success("指令查询失败", "失败原因：\n" + "未知错误");
+                                callback.onQueryTcpCmdFailure();
+                            }
+
+                        } catch (Exception e) {
+                            callback.onQueryTcpCmdFailure();
+                            LogKit.exception("指令查询失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        callback.onQueryTcpCmdFailure();
+                        LogKit.exception("指令查询失败", "访问失败, 异常信息：\n" + t.toString());
+                    }
+                });
+    }
+
+}

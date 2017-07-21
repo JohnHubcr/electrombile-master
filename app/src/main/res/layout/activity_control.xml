@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head_back"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/common_margin"
+        android:background="@color/module_normal_bg"
+        android:paddingBottom="@dimen/small_padding"
+        android:paddingLeft="@dimen/common_padding"
+        android:paddingRight="@dimen/common_padding"
+        android:paddingTop="@dimen/small_padding">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/vehicle_remote_lock_desc"
+            android:textColor="@color/translucent"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:id="@+id/ll_lock_button"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/module_normal_bg"
+        android:gravity="center"
+        android:paddingBottom="@dimen/small_padding"
+        android:paddingLeft="@dimen/common_padding"
+        android:paddingRight="@dimen/common_padding"
+        android:paddingTop="@dimen/small_padding">
+
+        <LinearLayout
+            android:id="@+id/ll_lock"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_lock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/lock"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/little_margin"
+                android:ems="4"
+                android:text="紧急锁车"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_unlock"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_unlock"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/unlock"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/little_margin"
+                android:ems="4"
+                android:text="紧急开锁"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/big_margin"
+        android:background="@color/module_normal_bg"
+        android:paddingBottom="@dimen/small_padding"
+        android:paddingLeft="@dimen/common_padding"
+        android:paddingRight="@dimen/common_padding"
+        android:paddingTop="@dimen/small_padding">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/vehicle_remote_p_status_desc"
+            android:textColor="@color/translucent"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:id="@+id/ll_pStatus_button"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/module_normal_bg"
+        android:gravity="center"
+        android:paddingBottom="@dimen/small_padding"
+        android:paddingLeft="@dimen/common_padding"
+        android:paddingRight="@dimen/common_padding"
+        android:paddingTop="@dimen/small_padding">
+
+        <LinearLayout
+            android:id="@+id/ll_pStatus_on"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_pStatus_on"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bug_on"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/little_margin"
+                android:ems="4"
+                android:text="设防"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_pStatus_off"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_pStatus_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bug_off"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/little_margin"
+                android:ems="4"
+                android:text="撤防"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/big_margin"
+        android:background="@color/module_normal_bg"
+        android:paddingBottom="@dimen/small_padding"
+        android:paddingLeft="@dimen/common_padding"
+        android:paddingRight="@dimen/common_padding"
+        android:visibility="gone"
+        android:paddingTop="@dimen/small_padding">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/vehicle_remote_light_desc"
+            android:textColor="@color/translucent"
+            android:textSize="12sp"/>
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:id="@+id/ll_light_button"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:background="@color/module_normal_bg"
+        android:gravity="center"
+        android:paddingBottom="@dimen/small_padding"
+        android:paddingLeft="@dimen/common_padding"
+        android:paddingRight="@dimen/common_padding"
+        android:paddingTop="@dimen/small_padding">
+
+        <LinearLayout
+            android:id="@+id/ll_light_on"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_light_on"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/light_on"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/little_margin"
+                android:ems="4"
+                android:text="远程开灯"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/ll_light_off"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/iv_light_off"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/light_off"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/little_margin"
+                android:ems="4"
+                android:text="远程关灯"
+                android:textColor="@color/white"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</LinearLayout>

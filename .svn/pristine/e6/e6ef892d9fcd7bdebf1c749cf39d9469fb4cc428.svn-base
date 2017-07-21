@@ -1,0 +1,34 @@
+package com.zenchn.electrombile.ui.fragment;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.base.BaseFragment;
+
+/**
+ * 作    者：wangr on 2017/2/24 15:40
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleCheckSTFragment extends BaseFragment {
+
+    @Override
+    protected String getTitle() {
+        return null;
+    }
+
+    @Override
+    protected int getContentLayoutRes() {
+        return R.layout.fragment_vehicle_check_st;
+    }
+
+    @Override
+    protected void initData() {
+
+    }
+
+    @Override
+    public boolean useEventBus() {
+        return true;
+    }
+
+
+}

@@ -1,0 +1,348 @@
+package com.zbar.lib;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.graphics.Point;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Vibrator;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
+import android.view.animation.TranslateAnimation;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.zbar.lib.camera.CameraManager;
+import com.zbar.lib.decode.CaptureActivityHandler;
+import com.zbar.lib.decode.InactivityTimer;
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.router.Router;
+import com.zenchn.electrombile.ui.activity.BinderActivity;
+import com.zenchn.electrombile.utils.CommonUtils;
+
+import java.io.IOException;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 作    者：wangr on 2017/3/10 14:21
+ * 描    述：扫描界面
+ * 修订记录：
+ */
+public class CaptureActivity extends BaseActivity implements Callback {
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.capture_crop_layout)
+    RelativeLayout captureCropLayout;
+    @BindView(R.id.capture_container)
+    RelativeLayout captureContainer;
+    @BindView(R.id.et_serialNumber)
+    EditText etSerialNumber;
+    @BindView(R.id.input_container)
+    LinearLayout inputContainer;
+
+    private CaptureActivityHandler handler;
+    private boolean hasSurface;
+    private InactivityTimer inactivityTimer;
+    private MediaPlayer mediaPlayer;
+    private boolean playBeep;
+    private static final float BEEP_VOLUME = 0.50f;
+    private boolean vibrate;
+    private int x = 0;
+    private int y = 0;
+    private int cropWidth = 0;
+    private int cropHeight = 0;
+
+    private boolean isNeedCapture = false;
+
+    public boolean isNeedCapture() {
+        return isNeedCapture;
+    }
+
+    public void setNeedCapture(boolean isNeedCapture) {
+        this.isNeedCapture = isNeedCapture;
+    }
+
+    public int getX() {
+        return x;
+    }
+
+    public void setX(int x) {
+        this.x = x;
+    }
+
+    public int getY() {
+        return y;
+    }
+
+    public void setY(int y) {
+        this.y = y;
+    }
+
+    public int getCropWidth() {
+        return cropWidth;
+    }
+
+    public void setCropWidth(int cropWidth) {
+        this.cropWidth = cropWidth;
+    }
+
+    public int getCropHeight() {
+        return cropHeight;
+    }
+
+    public void setCropHeight(int cropHeight) {
+        this.cropHeight = cropHeight;
+    }
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        initData();
+    }
+
+    protected void initData() {
+        tvTitle.setText(getString(R.string.title_bind_vehicle));
+
+        // 初始化 CameraManager
+        CameraManager.init(getApplicationContext());
+        hasSurface = false;
+        inactivityTimer = new InactivityTimer(this);
+
+        ImageView mQrLineView = (ImageView) findViewById(R.id.capture_scan_line);
+        TranslateAnimation mAnimation = new TranslateAnimation(TranslateAnimation.ABSOLUTE, 0f, TranslateAnimation.ABSOLUTE, 0f,
+                TranslateAnimation.RELATIVE_TO_PARENT, 0f, TranslateAnimation.RELATIVE_TO_PARENT, 0.9f);
+        mAnimation.setDuration(1500);
+        mAnimation.setRepeatCount(-1);
+        mAnimation.setRepeatMode(Animation.REVERSE);
+        mAnimation.setInterpolator(new LinearInterpolator());
+        mQrLineView.setAnimation(mAnimation);
+    }
+
+    boolean flag = true;
+
+    protected void light() {
+        if (flag) {
+            flag = false;
+            // 开闪光灯
+            CameraManager.get().openLight();
+        } else {
+            flag = true;
+            // 关闪光灯
+            CameraManager.get().offLight();
+        }
+
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    protected void onResume() {
+        super.onResume();
+        SurfaceView surfaceView = (SurfaceView) findViewById(R.id.capture_preview);
+        SurfaceHolder surfaceHolder = surfaceView.getHolder();
+        if (hasSurface) {
+            initCamera(surfaceHolder);
+        } else {
+            surfaceHolder.addCallback(this);
+            surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+        }
+        playBeep = true;
+        AudioManager audioService = (AudioManager) getSystemService(AUDIO_SERVICE);
+        if (audioService.getRingerMode() != AudioManager.RINGER_MODE_NORMAL) {
+            playBeep = false;
+        }
+        initBeepSound();
+        vibrate = true;
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (handler != null) {
+            handler.quitSynchronously();
+            handler.removeCallbacksAndMessages(null);
+            handler = null;
+        }
+        CameraManager.get().closeDriver();
+    }
+
+    @Override
+    protected void onDestroy() {
+        inactivityTimer.shutdown();
+        super.onDestroy();
+    }
+
+    @Override
+    protected void handler(Message msg) {
+
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_bind_vehicle_scan;
+    }
+
+
+    public void handleDecode(String result) {
+        inactivityTimer.onActivity();
+        playBeepSoundAndVibrate();
+//		Toast.makeText(getApplicationContext(), result, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, BinderActivity.class);
+        intent.putExtra("result", result);
+        startActivity(intent);
+        finish();
+        // 连续扫描，不发送此消息扫描一次结束后就不能再次扫描
+        // handler.sendEmptyMessage(R.id.restart_preview);
+    }
+
+    private void initCamera(SurfaceHolder surfaceHolder) {
+        try {
+            CameraManager.get().openDriver(surfaceHolder);
+
+            Point point = CameraManager.get().getCameraResolution();
+            int width = point.y;
+            int height = point.x;
+
+            int x = captureCropLayout.getLeft() * width / captureContainer.getWidth();
+            int y = captureCropLayout.getTop() * height / captureContainer.getHeight();
+
+            int cropWidth = captureCropLayout.getWidth() * width / captureContainer.getWidth();
+            int cropHeight = captureCropLayout.getHeight() * height / captureContainer.getHeight();
+
+            setX(x);
+            setY(y);
+            setCropWidth(cropWidth);
+            setCropHeight(cropHeight);
+            // 设置是否需要截图
+            setNeedCapture(true);
+
+        } catch (IOException ioe) {
+            return;
+        } catch (RuntimeException e) {
+            return;
+        }
+        if (handler == null) {
+            handler = new CaptureActivityHandler(CaptureActivity.this);
+        }
+    }
+
+    @Override
+    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
+    }
+
+    @Override
+    public void surfaceCreated(SurfaceHolder holder) {
+        if (!hasSurface) {
+            hasSurface = true;
+            initCamera(holder);
+        }
+    }
+
+    @Override
+    public void surfaceDestroyed(SurfaceHolder holder) {
+        hasSurface = false;
+    }
+
+    public Handler getHandler() {
+        return handler;
+    }
+
+    private void initBeepSound() {
+        if (playBeep && mediaPlayer == null) {
+            setVolumeControlStream(AudioManager.STREAM_MUSIC);
+            mediaPlayer = new MediaPlayer();
+            mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            mediaPlayer.setOnCompletionListener(beepListener);
+
+            AssetFileDescriptor file = getResources().openRawResourceFd(R.raw.beep);
+            try {
+                mediaPlayer.setDataSource(file.getFileDescriptor(), file.getStartOffset(), file.getLength());
+                file.close();
+                mediaPlayer.setVolume(BEEP_VOLUME, BEEP_VOLUME);
+                mediaPlayer.prepare();
+            } catch (IOException e) {
+                mediaPlayer = null;
+            }
+        }
+    }
+
+    private static final long VIBRATE_DURATION = 200L;
+
+    private void playBeepSoundAndVibrate() {
+        if (playBeep && mediaPlayer != null) {
+            mediaPlayer.start();
+        }
+        if (vibrate) {
+            Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+            vibrator.vibrate(VIBRATE_DURATION);
+        }
+    }
+
+    private final OnCompletionListener beepListener = new OnCompletionListener() {
+        public void onCompletion(MediaPlayer mediaPlayer) {
+            mediaPlayer.seekTo(0);
+        }
+    };
+
+    @Override
+    public void onBackPressed() {
+        setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    @OnClick({R.id.ll_back, R.id.iv_input, R.id.iv_scan, R.id.tv_commit})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ll_back:
+                onBackPressed();
+                break;
+            case R.id.iv_input:
+                captureContainer.setVisibility(View.GONE);
+                inputContainer.setVisibility(View.VISIBLE);
+                break;
+            case R.id.iv_scan:
+                inputContainer.setVisibility(View.GONE);
+                captureContainer.setVisibility(View.VISIBLE);
+                break;
+            case R.id.tv_commit:
+                String serialNumber = etSerialNumber.getText().toString();
+                if (CommonUtils.isEmpty(serialNumber)) {
+                    showResMessage(R.string.input_serialNumber_empty);
+                } else {
+                    Intent intent = new Intent(this, BinderActivity.class);
+                    intent.putExtra("result", serialNumber);
+                    startActivity(intent);
+                    finish();
+                }
+                break;
+        }
+    }
+
+    public static void launch(Activity activity) {
+        launch(activity, new Bundle());
+    }
+
+    public static void launch(Activity activity, Bundle bundle) {
+        Router
+                .newIntent()
+                .from(activity)
+                .to(CaptureActivity.class)
+                .data(bundle)
+                .launch();
+    }
+
+}

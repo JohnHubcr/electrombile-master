@@ -1,0 +1,279 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/in_head"
+            layout="@layout/include_top_head"/>
+
+        <TextView
+            android:id="@+id/tv_save"
+            style="@style/HeadTitleRightTextViewStyle"
+            android:layout_width="70dp"
+            android:layout_alignParentRight="true"
+            android:text="存草稿"
+            android:visibility="gone"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                style="@style/CommonButtonStyle"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/common_margin"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingBottom="@dimen/common_padding"
+                android:paddingTop="@dimen/common_padding">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:gravity="center_horizontal"
+                    android:text="@string/insurance_activate_desc_top"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:layout_marginTop="@dimen/common_margin"
+                    android:text="@string/insurance_activate_desc_mid"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:layout_marginTop="@dimen/big_margin"
+                    android:gravity="center_horizontal"
+                    android:text="@string/insurance_activate_desc_below"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                style="@style/CommonButtonStyle"
+                android:layout_marginTop="@dimen/common_margin">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:ems="4"
+                    android:text="姓        名"
+                    android:textColor="@color/white"/>
+
+                <EditText
+                    android:id="@+id/et_name"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical|end"
+                    android:hint="@string/activate_insurance_input_hint"
+                    android:maxLength="10"
+                    android:singleLine="true"
+                    android:textColor="@color/base_text_color_gray"
+                    android:textColorHint="@color/base_text_color_tint_grey"
+                    android:textSize="14sp"/>
+
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"/>
+
+
+            <LinearLayout
+                style="@style/CommonButtonStyle">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:ems="4"
+                    android:text="身份证号"
+                    android:textColor="@color/white"/>
+
+                <EditText
+                    android:id="@+id/et_idCard"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical|end"
+                    android:hint="@string/activate_insurance_input_hint"
+                    android:maxLength="18"
+                    android:singleLine="true"
+                    android:textColor="@color/base_text_color_gray"
+                    android:textColorHint="@color/base_text_color_tint_grey"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"/>
+
+            <LinearLayout
+                style="@style/CommonButtonStyle"
+                android:paddingRight="0dp">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:ems="4"
+                    android:text="联系方式"
+                    android:textColor="@color/white"/>
+
+                <EditText
+                    android:id="@+id/et_mobile_phone"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical|end"
+                    android:inputType="phone"
+                    android:maxLength="15"
+                    android:singleLine="true"
+                    android:textColor="@color/base_text_color_gray"
+                    android:textSize="14sp"/>
+
+                <LinearLayout
+                    android:layout_width="53dp"
+                    android:layout_height="43dp"
+                    android:gravity="center|right"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/iv_clear"
+                        style="@style/BaseEditTextClearStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:visibility="gone"/>
+
+                    <ImageView
+                        android:id="@+id/iv_choose_contact"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/contacts"/>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"/>
+
+            <LinearLayout
+                style="@style/CommonButtonStyle">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:ems="4"
+                    android:text="车        号"
+                    android:textColor="@color/white"/>
+
+                <EditText
+                    android:id="@+id/et_vehicle_number"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical|end"
+                    android:hint="@string/activate_insurance_vehicle_hint"
+                    android:maxLength="15"
+                    android:singleLine="true"
+                    android:textColor="@color/base_text_color_gray"
+                    android:textColorHint="@color/base_text_color_tint_grey"
+                    android:textSize="14sp"/>
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"/>
+
+            <LinearLayout
+                style="@style/CommonButtonStyle">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:ems="4"
+                    android:text="车架编号"
+                    android:textColor="@color/white"/>
+
+                <EditText
+                    android:id="@+id/et_frame_number"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical|end"
+                    android:hint="@string/activate_insurance_vehicle_hint"
+                    android:singleLine="true"
+                    android:textColor="@color/base_text_color_gray"
+                    android:textColorHint="@color/base_text_color_tint_grey"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"/>
+
+            <LinearLayout
+                style="@style/CommonButtonStyle">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:ems="4"
+                    android:text="电机编号"
+                    android:textColor="@color/white"/>
+
+                <EditText
+                    android:id="@+id/et_machine_number"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@color/transparent"
+                    android:gravity="center_vertical|end"
+                    android:hint="@string/activate_insurance_vehicle_hint"
+                    android:singleLine="true"
+                    android:textColor="@color/base_text_color_gray"
+                    android:textColorHint="@color/base_text_color_tint_grey"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="0.5dp"
+                android:background="@color/transparent"/>
+
+            <LinearLayout
+                android:id="@+id/ll_commit"
+                style="@style/GradientButtonStyle"
+                android:layout_marginBottom="@dimen/big_margin"
+                android:layout_marginTop="@dimen/big_margin"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="提交申请"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

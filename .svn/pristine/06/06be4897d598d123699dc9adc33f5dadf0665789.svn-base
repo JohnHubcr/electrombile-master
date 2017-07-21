@@ -1,0 +1,99 @@
+package com.zenchn.electrombile.engine.bean;
+
+/**
+ * 作    者：wangr on 2017/2/28 18:32
+ * 描    述：金开协议解析结果
+ * 修订记录：
+ */
+public class VehicleCheckResultForJKInfo {
+
+    private JK_BMSTrouble JKBmsTrouble;
+    private JK_ChargerTrouble JKChargerTrouble;
+    private JK_ControlTrouble JKControlTrouble;
+    private JK_ECUOnlineStatus JKEcuOnlineStatus;
+    private JK_ECUTrouble JKEcuTrouble;
+    private JK_GyroscopeStatus JKGyroscopeStatus;
+    private JK_MeterTrouble JKMeterTrouble;
+
+    public VehicleCheckResultForJKInfo() {
+    }
+
+    public VehicleCheckResultForJKInfo(JK_BMSTrouble JKBmsTrouble, JK_ChargerTrouble JKChargerTrouble, JK_ControlTrouble JKControlTrouble, JK_ECUOnlineStatus JKEcuOnlineStatus, JK_ECUTrouble JKEcuTrouble, JK_GyroscopeStatus JKGyroscopeStatus, JK_MeterTrouble JKMeterTrouble) {
+        this.JKBmsTrouble = JKBmsTrouble;
+        this.JKChargerTrouble = JKChargerTrouble;
+        this.JKControlTrouble = JKControlTrouble;
+        this.JKEcuOnlineStatus = JKEcuOnlineStatus;
+        this.JKEcuTrouble = JKEcuTrouble;
+        this.JKGyroscopeStatus = JKGyroscopeStatus;
+        this.JKMeterTrouble = JKMeterTrouble;
+    }
+
+    public JK_BMSTrouble getJKBmsTrouble() {
+        return JKBmsTrouble;
+    }
+
+    public void setJKBmsTrouble(JK_BMSTrouble JKBmsTrouble) {
+        this.JKBmsTrouble = JKBmsTrouble;
+    }
+
+    public JK_ChargerTrouble getJKChargerTrouble() {
+        return JKChargerTrouble;
+    }
+
+    public void setJKChargerTrouble(JK_ChargerTrouble JKChargerTrouble) {
+        this.JKChargerTrouble = JKChargerTrouble;
+    }
+
+    public JK_ControlTrouble getJKControlTrouble() {
+        return JKControlTrouble;
+    }
+
+    public void setJKControlTrouble(JK_ControlTrouble JKControlTrouble) {
+        this.JKControlTrouble = JKControlTrouble;
+    }
+
+    public JK_ECUOnlineStatus getJKEcuOnlineStatus() {
+        return JKEcuOnlineStatus;
+    }
+
+    public void setJKEcuOnlineStatus(JK_ECUOnlineStatus JKEcuOnlineStatus) {
+        this.JKEcuOnlineStatus = JKEcuOnlineStatus;
+    }
+
+    public JK_ECUTrouble getJKEcuTrouble() {
+        return JKEcuTrouble;
+    }
+
+    public void setJKEcuTrouble(JK_ECUTrouble JKEcuTrouble) {
+        this.JKEcuTrouble = JKEcuTrouble;
+    }
+
+    public JK_GyroscopeStatus getJKGyroscopeStatus() {
+        return JKGyroscopeStatus;
+    }
+
+    public void setJKGyroscopeStatus(JK_GyroscopeStatus JKGyroscopeStatus) {
+        this.JKGyroscopeStatus = JKGyroscopeStatus;
+    }
+
+    public JK_MeterTrouble getJKMeterTrouble() {
+        return JKMeterTrouble;
+    }
+
+    public void setJKMeterTrouble(JK_MeterTrouble JKMeterTrouble) {
+        this.JKMeterTrouble = JKMeterTrouble;
+    }
+
+    @Override
+    public String toString() {
+        return "VehicleCheckResultForJKInfo:" + "\n" +
+                "JK_BmsTrouble:" + JKBmsTrouble.toString() + "\n" +
+                "JK_ChargerTrouble:" + JKChargerTrouble.toString() + "\n" +
+                "JK_ControlTrouble:" + JKControlTrouble.toString() + "\n" +
+                "JK_EcuOnlineStatus:" + JKEcuOnlineStatus.toString() + "\n" +
+                "JK_EcuTrouble:" + JKEcuTrouble.toString() + "\n" +
+                "JK_GyroscopeStatus:" + JKGyroscopeStatus.toString() + "\n" +
+                "JK_MeterTrouble:" + JKMeterTrouble.toString();
+    }
+
+}

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:android_custom="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head"/>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle"
+        android:layout_width="match_parent"
+        android:layout_height="80dp"
+        android:layout_marginTop="@dimen/common_margin"
+        android:gravity="center_vertical"
+        android:paddingRight="0dp">
+
+        <com.zenchn.electrombile.widget.CircleTextImageView
+            android:id="@+id/iv_head"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:background="@drawable/head_shape"
+            android:src="@drawable/head"
+            android_custom:citv_border_color="@color/head_stroke_gray"
+            android_custom:citv_border_width="2px"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/common_margin"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tv_mobile_phone"
+                style="@style/BaseTextViewStyle"
+                android:text="186****8966"
+                android:textColor="@color/white"/>
+
+            <TextView
+                style="@style/BaseTextViewStyle"
+                android:layout_marginTop="@dimen/little_margin"
+                android:text="开通服务尊享无忧服务"
+                android:textColor="@color/ios_text_color_blue"
+                android:textSize="13sp"/>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/module_normal_bg"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/common_padding"
+        android:paddingLeft="@dimen/common_padding"
+        android:paddingRight="@dimen/common_padding"
+        android:paddingTop="@dimen/big_padding">
+
+        <TextView
+            style="@style/BaseTextViewStyle"
+            android:text="服务套餐"
+            android:textColor="@color/translucent"/>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="10dp"/>
+
+    </LinearLayout>
+</LinearLayout>

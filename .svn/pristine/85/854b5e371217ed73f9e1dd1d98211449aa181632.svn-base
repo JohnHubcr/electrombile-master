@@ -1,0 +1,27 @@
+package com.zenchn.electrombile.utils;
+
+/**
+ * 作    者：wangr on 2017/2/22 14:44
+ * 描    述： 
+ * 修订记录：
+ */
+public class EqumodelUtils {
+
+    //硬件标示信息
+    public static final int EQUMODEL_ST = 4;//神腾协议
+
+    /**
+     * @param equmodel
+     * @return Boolean
+     * null表示未激活设备
+     * true表示需要屏蔽功能
+     * false表示全功能
+     */
+    public static Boolean isHideFunction(int equmodel) {
+        return equmodel == 0 ? null : equmodel == 1 ? true : false;
+    }
+
+    public static boolean isEqumodelForST(int equmodel) {
+        return equmodel == EQUMODEL_ST;
+    }
+}

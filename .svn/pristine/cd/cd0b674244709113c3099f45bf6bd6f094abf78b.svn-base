@@ -1,0 +1,860 @@
+package com.zenchn.electrombile.ui.activity;
+
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import com.baidu.location.BDLocation;
+import com.zenchn.electrombile.BuildConf;
+import com.zenchn.electrombile.Constants;
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.entity.InsuranceClaimInfo;
+import com.zenchn.electrombile.entity.model.InsuranceStatusEnum;
+import com.zenchn.electrombile.eventBus.BDLocationEvent;
+import com.zenchn.electrombile.presenter.InsuranceClaimPresenter;
+import com.zenchn.electrombile.presenter.impl.InsuranceClaimPresenterImpl;
+import com.zenchn.electrombile.ui.view.InsuranceClaimView;
+import com.zenchn.electrombile.utils.CommonUtils;
+import com.zenchn.electrombile.utils.imageUtils.ImageFileSelector;
+import com.zenchn.electrombile.utils.imageUtils.ImageLoaderHelper;
+import com.zenchn.electrombile.utils.imageUtils.ImageUtil;
+import com.zenchn.electrombile.widget.ActionSheet;
+import com.zenchn.electrombile.widget.PickerView.AreaPickerView;
+import com.zenchn.electrombile.widget.PickerView.OptionsPickerView;
+import com.zenchn.electrombile.widget.PickerView.TimePickerView;
+import com.zenchn.electrombile.widget.PickerView.model.AreaModel;
+import com.zenchn.electrombile.wrapper.ACacheWrapper;
+import com.zenchn.mlibrary.utils.DateUtils;
+import com.zenchn.mlibrary.utils.FileUtils;
+
+import org.greenrobot.eventbus.Subscribe;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.Set;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 作    者：wangr on 2017/3/8 13:51
+ * 描    述：保险理赔信息补充的界面
+ * 修订记录：
+ */
+public class InsuranceClaimActivity extends BaseActivity implements InsuranceClaimView, ImageFileSelector.ImageFilesCallback, TextWatcher, ActionSheet.MenuItemClickListener, OptionsPickerView.OnOptionsSelectListener, TimePickerView.OnTimeSelectListener, AreaPickerView.OnAreaSelectListener {
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.tv_edit)
+    TextView tvEdit;
+    @BindView(R.id.ll_head)
+    LinearLayout llHead;
+    @BindView(R.id.tv_pay_time)
+    TextView tvPayTime;
+    @BindView(R.id.et_cost_price)
+    EditText etCostPrice;
+    @BindView(R.id.tv_area)
+    TextView tvArea;
+    @BindView(R.id.et_address)
+    EditText etAddress;
+    @BindView(R.id.iv_id_card_front)
+    ImageView ivIdCardFront;
+    @BindView(R.id.iv_id_card_back)
+    ImageView ivIdCardBack;
+    @BindView(R.id.iv_user_notice)
+    ImageView ivUserNotice;
+    @BindView(R.id.iv_vehicle_certificate)
+    ImageView ivVehicleCertificate;
+    @BindView(R.id.iv_vehicle_invoice)
+    ImageView ivVehicleInvoice;
+    @BindView(R.id.iv_vehicle_photo)
+    ImageView ivVehiclePhoto;
+    @BindView(R.id.ll_commit)
+    LinearLayout llCommit;
+    @BindView(R.id.ll_form)
+    LinearLayout llForm;
+    @BindView(R.id.sv_subject)
+    ScrollView svSubject;
+    @BindView(R.id.ll_main)
+    LinearLayout llMain;
+
+    private ImageFileSelector imageFileSelector;
+    private InsuranceClaimPresenter presenter;
+
+    private int protectionStatus;
+
+    private ArrayList<EditText> editTexts;
+
+    private Map<String, Bitmap> bitmaps;
+    private Map<String, String> imgNetworkPath;
+    private Map<String, File> fileParams;
+
+    private TimePickerView pvTime;
+    private AreaPickerView pvArea;
+    private String key;
+
+    private ActionSheet menuView;
+    private boolean whetherSubmit;
+    private boolean editable;
+    private BDLocation bdLocation;
+    private int operateType;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (bitmaps != null) {
+            Set<String> keySet = bitmaps.keySet();
+            for (String key : keySet) {
+                Bitmap thumbnail = bitmaps.get(key);
+                if (thumbnail != null)
+                    setThumbnail(key, thumbnail);
+            }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        presenter.onDestroy();
+        clearThumbnail();
+        removeListener();
+        super.onDestroy();
+    }
+
+    @Override
+    public boolean useEventBus() {
+        return true;
+    }
+
+    public InsuranceClaimActivity() {
+        this.imageFileSelector = new ImageFileSelector(this);
+        this.presenter = new InsuranceClaimPresenterImpl(this);
+    }
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        addListener();
+        addEditTextView();
+        initTempFolder();
+        initImageConfig();
+        initData();
+    }
+
+    private void addListener() {
+        etCostPrice.addTextChangedListener(this);
+    }
+
+    private void removeListener() {
+        etCostPrice.removeTextChangedListener(this);
+    }
+
+    private void addEditTextView() {
+        editTexts = new ArrayList<>();
+        editTexts.add(etAddress);
+        editTexts.add(etCostPrice);
+    }
+
+    /**
+     * 检查缓存图片的文件夹
+     */
+    private void initTempFolder() {
+        if (!FileUtils.isFolderExist(Constants.appFolder)) {// 判断文件目录是否存在
+            FileUtils.createFolder(Constants.appFolder);
+        }
+    }
+
+    /**
+     * 设置图片工具类的配置
+     */
+    private void initImageConfig() {
+        imageFileSelector.setQuality(80);
+        imageFileSelector.setCallback(this);
+        imageFileSelector.setDelete(false);
+    }
+
+    @Override
+    protected void initData() {
+        protectionStatus = getIntent().getIntExtra("protectionStatus", InsuranceStatusEnum.审核中.ordinal());
+        operateType = getIntent().getIntExtra("operateType", Constants.INSURANCE.INSURANCE_CLAIM_ADD);
+
+        whetherSubmit = Constants.INSURANCE.INSURANCE_CLAIM_COMPLETED == loginInfo.getPerfectStatus();
+        tvEdit.setVisibility(whetherSubmit ? View.VISIBLE : View.INVISIBLE);
+        tvTitle.setText(getString(R.string.title_improve_activate));
+        setEditable(editable = !whetherSubmit);//已经提交过进入界面默认不可编辑
+        if (whetherSubmit) {
+            presenter.getUserClaims(loginInfo.getAccessToken(), loginInfo.getSerialNumber());//获取理赔信息完善状态
+        } else {
+            renewTemp();//恢复上次保存的内容
+        }
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_insurance_claim;
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (pvTime != null && pvTime.isShowing()) {
+            pvTime.dismiss();
+            return;
+        }
+        if (pvArea != null && pvArea.isShowing()) {
+            pvArea.dismiss();
+            return;
+        }
+        hideProgress();
+        if (!whetherSubmit)
+            saveTemp();
+        if (Constants.INSURANCE.INSURANCE_CLAIM_ADD == operateType)
+            setResult(protectionStatus);
+        else
+            setResult(RESULT_CANCELED);
+        finish();
+    }
+
+    /**
+     * 保存未提交的内容
+     */
+    private void saveTemp() {
+        ACacheWrapper.saveInsuranceClaimInfo(getInsuranceClaimInfo());
+    }
+
+    /**
+     * 获取为提交的内容
+     */
+    private void renewTemp() {
+        InsuranceClaimInfo insuranceClaimInfo = ACacheWrapper.getInsuranceClaimInfo();
+        renewInsuranceClaimInfo(insuranceClaimInfo, false);
+    }
+
+    @Override
+    public void renewInsuranceClaimInfo(InsuranceClaimInfo insuranceClaimInfo, boolean isOnline) {
+
+        if (insuranceClaimInfo != null) {
+            String address = insuranceClaimInfo.getAddress();
+            if (CommonUtils.isNonNull(address))
+                etAddress.setText(address);
+
+            String area = insuranceClaimInfo.getArea();
+            if (CommonUtils.isNonNull(area))
+                tvArea.setText(area);
+
+            float costPrice = insuranceClaimInfo.getCostPrice();
+            etCostPrice.setText(costPrice <= 0 ? "0" : String.format(getString(R.string.price_base), costPrice));
+
+            String payTime = insuranceClaimInfo.getPayTime();
+            if (CommonUtils.isNonNull(payTime))
+                tvPayTime.setText(payTime);
+
+            if (isOnline) {
+
+                if (imgNetworkPath == null)
+                    imgNetworkPath = new LinkedHashMap<>();// 文件数据
+
+                String qualificationOnlinePath = insuranceClaimInfo.getQualification();
+                if (CommonUtils.isNonNull(qualificationOnlinePath)) {
+                    imgNetworkPath.put(MapKey.vehicleCertificate, qualificationOnlinePath);
+                    ImageLoaderHelper.displayImage(qualificationOnlinePath, ivVehicleCertificate);
+                }
+
+                String vehicleInvoiceOnlinePath = insuranceClaimInfo.getVehicleInvoice();
+                if (CommonUtils.isNonNull(vehicleInvoiceOnlinePath)) {
+                    imgNetworkPath.put(MapKey.vehicleInvoice, vehicleInvoiceOnlinePath);
+                    ImageLoaderHelper.displayImage(vehicleInvoiceOnlinePath, ivVehicleInvoice);
+                }
+
+                String vehiclePhotoOnlinePath = insuranceClaimInfo.getVehiclePhoto();
+                if (CommonUtils.isNonNull(vehiclePhotoOnlinePath)) {
+                    imgNetworkPath.put(MapKey.vehiclePhoto, vehiclePhotoOnlinePath);
+                    ImageLoaderHelper.displayImage(vehiclePhotoOnlinePath, ivVehiclePhoto);
+                }
+
+                String insuranceSignOnlinePath = insuranceClaimInfo.getInsuranceSign();
+                if (CommonUtils.isNonNull(insuranceSignOnlinePath)) {
+                    imgNetworkPath.put(MapKey.insuranceSign, insuranceSignOnlinePath);
+                    ImageLoaderHelper.displayImage(insuranceSignOnlinePath, ivUserNotice);
+                }
+
+                String idCardFrontOnlinePath = insuranceClaimInfo.getIdCardFront();
+                if (CommonUtils.isNonNull(idCardFrontOnlinePath)) {
+                    imgNetworkPath.put(MapKey.idCardFront, idCardFrontOnlinePath);
+                    ImageLoaderHelper.displayImage(idCardFrontOnlinePath, ivIdCardFront);
+                }
+
+                String idCardBackOnlinePath = insuranceClaimInfo.getIdCardBack();
+                if (CommonUtils.isNonNull(idCardBackOnlinePath)) {
+                    imgNetworkPath.put(MapKey.idCardBack, idCardBackOnlinePath);
+                    ImageLoaderHelper.displayImage(idCardBackOnlinePath, ivIdCardBack);
+                }
+
+            } else {
+
+                if (fileParams == null)
+                    fileParams = new LinkedHashMap<>();// 文件数据
+                if (bitmaps == null)
+                    bitmaps = new HashMap<>();// 缩略图
+
+                String qualificationPath = insuranceClaimInfo.getQualification();
+                if (CommonUtils.isNonNull(qualificationPath) && FileUtils.isFileExist(qualificationPath)) {
+                    File certificateFile = new File(qualificationPath);
+                    fileParams.put(MapKey.vehicleCertificate, certificateFile);
+                    Bitmap thumbnail = ImageUtil.revitionImageSize(qualificationPath);
+                    bitmaps.put(MapKey.vehicleCertificate, thumbnail);
+                    setThumbnail(MapKey.vehicleCertificate, thumbnail);
+                }
+
+                String vehicleInvoicePath = insuranceClaimInfo.getVehicleInvoice();
+                if (CommonUtils.isNonNull(vehicleInvoicePath) && FileUtils.isFileExist(vehicleInvoicePath)) {
+                    File invoicePathFile = new File(vehicleInvoicePath);
+                    fileParams.put(MapKey.vehicleInvoice, invoicePathFile);
+                    Bitmap thumbnail = ImageUtil.revitionImageSize(vehicleInvoicePath);
+                    bitmaps.put(MapKey.vehicleInvoice, thumbnail);
+                    setThumbnail(MapKey.vehicleInvoice, thumbnail);
+                }
+
+                String vehiclePhoto = insuranceClaimInfo.getVehiclePhoto();
+                if (CommonUtils.isNonNull(vehiclePhoto) && FileUtils.isFileExist(vehiclePhoto)) {
+                    File motorPhotoFile = new File(vehiclePhoto);
+                    fileParams.put(MapKey.vehiclePhoto, motorPhotoFile);
+                    Bitmap thumbnail = ImageUtil.revitionImageSize(vehiclePhoto);
+                    bitmaps.put(MapKey.vehiclePhoto, thumbnail);
+                    setThumbnail(MapKey.vehiclePhoto, thumbnail);
+                }
+
+                String insuranceSignPath = insuranceClaimInfo.getInsuranceSign();
+                if (CommonUtils.isNonNull(insuranceSignPath) && FileUtils.isFileExist(insuranceSignPath)) {
+                    File insuranceSignFile = new File(insuranceSignPath);
+                    fileParams.put(MapKey.insuranceSign, insuranceSignFile);
+                    Bitmap thumbnail = ImageUtil.revitionImageSize(insuranceSignPath);
+                    bitmaps.put(MapKey.insuranceSign, thumbnail);
+                    setThumbnail(MapKey.insuranceSign, thumbnail);
+                }
+
+
+                String idCardFrontPath = insuranceClaimInfo.getIdCardFront();
+                if (CommonUtils.isNonNull(idCardFrontPath) && FileUtils.isFileExist(idCardFrontPath)) {
+                    File idCardFrontFile = new File(idCardFrontPath);
+                    fileParams.put(MapKey.idCardFront, idCardFrontFile);
+                    Bitmap thumbnail = ImageUtil.revitionImageSize(idCardFrontPath);
+                    bitmaps.put(MapKey.idCardFront, thumbnail);
+                    setThumbnail(MapKey.idCardFront, thumbnail);
+                }
+
+                String idCardBackPath = insuranceClaimInfo.getIdCardBack();
+                if (CommonUtils.isNonNull(idCardBackPath) && FileUtils.isFileExist(idCardBackPath)) {
+                    File idCardBackFile = new File(idCardBackPath);
+                    fileParams.put(MapKey.idCardBack, idCardBackFile);
+                    Bitmap thumbnail = ImageUtil.revitionImageSize(idCardBackPath);
+                    bitmaps.put(MapKey.idCardBack, thumbnail);
+                    setThumbnail(MapKey.idCardBack, thumbnail);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onSubmitCompleted(boolean result) {
+        if (result) {
+            showResMessage(R.string.improve_insurance_success);
+            if (Constants.INSURANCE.INSURANCE_CLAIM_ADD == operateType)
+                setResult(protectionStatus);
+            else
+                setResult(RESULT_OK);
+            finish();
+        } else {
+            showResMessage(R.string.improve_insurance_failure);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        imageFileSelector.onActivityResult(requestCode, resultCode, key, data);
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Subscribe(sticky = true)
+    public void onEventMainThread(BDLocationEvent event) {
+        BDLocation bdLocation = event.getBdLocation();
+        if (editable && null != bdLocation) {
+            this.bdLocation = bdLocation;
+            tvArea.setText(String.format(getString(R.string.area_format), bdLocation.getProvince(), bdLocation.getCity(), bdLocation.getDistrict()));
+            etAddress.setText(bdLocation.getStreet());
+        }
+    }
+
+    @OnClick({R.id.ll_back, R.id.ll_id_card_front, R.id.ll_id_card_back, R.id.ll_user_notice, R.id.ll_vehicle_certificate, R.id.ll_vehicle_invoice, R.id.ll_vehicle_photo, R.id.ll_commit, R.id.ll_purchase_date, R.id.ll_area, R.id.tv_edit})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ll_back:
+                onBackPressed();
+                break;
+            case R.id.ll_purchase_date:
+                if (editable) {
+                    if (null == pvTime) {// 时间选择器
+                        pvTime = new TimePickerView(this, TimePickerView.Type.YEAR_MONTH_DAY);
+                        pvTime.setTitle(getString(R.string.improve_insurance_choose_time_title));
+                        pvTime.setOnTimeSelectListener(this);
+                    }
+                    pvTime.show();
+                }
+                break;
+
+            case R.id.ll_area:
+                if (editable) {
+                    if (null == pvArea) {// 地区选择器
+                        pvArea = new AreaPickerView(this);
+                        pvArea.setTitle(getString(R.string.improve_insurance_choose_area_title));
+                        if (null != bdLocation)
+                            pvArea.setDefaultSeat(bdLocation.getProvince(), bdLocation.getCity(), bdLocation.getDistrict());
+                        pvArea.setOnAreaSelectListener(this);
+                    }
+                    pvArea.show();
+                }
+                break;
+
+            case R.id.ll_id_card_front:
+                if (editable) {
+                    key = MapKey.idCardFront;
+                    showActionSheet();
+                }
+                break;
+            case R.id.ll_id_card_back:
+                if (editable) {
+                    key = MapKey.idCardBack;
+                    showActionSheet();
+                }
+                break;
+            case R.id.ll_user_notice:
+                if (editable) {
+                    key = MapKey.insuranceSign;
+                    showActionSheet();
+                }
+                break;
+            case R.id.ll_vehicle_certificate:
+                if (editable) {
+                    key = MapKey.vehicleCertificate;
+                    showActionSheet();
+                }
+                break;
+            case R.id.ll_vehicle_invoice:
+                if (editable) {
+                    key = MapKey.vehicleInvoice;
+                    showActionSheet();
+                }
+                break;
+            case R.id.ll_vehicle_photo:
+                if (editable) {
+                    key = MapKey.vehiclePhoto;
+                    showActionSheet();
+                }
+                break;
+            case R.id.ll_commit:
+                InsuranceClaimInfo insuranceClaimInfo = getInsuranceClaimInfo();
+                if (checkInsuranceClaimInfo(insuranceClaimInfo)) {
+                    presenter.submitInsuranceClaimInfo(loginInfo.getAccessToken(), loginInfo.getSerialNumber(), insuranceClaimInfo, fileParams);
+                }
+                break;
+            case R.id.tv_edit:
+                setEditable(true);//设置可编辑状态
+                svSubject.scrollTo(0, llHead.getHeight());
+                break;
+        }
+    }
+
+    @Override
+    public void onTimeSelect(Date date) {
+        String buyDate = DateUtils.convertDateToString(date, "yyyy-MM-dd");
+        tvPayTime.setText(buyDate);
+    }
+
+    @Override
+    public void onAreaSelect(AreaModel areaModel) {
+        if (areaModel != null)
+            tvArea.setText(String.format(getString(R.string.area_format), areaModel.getProvince(), areaModel.getCity(), areaModel.getDistrict()));
+    }
+
+    @Override
+    public void onOptionsSelect(int options1, int option2, int options3) {
+        tvArea.setText("");
+    }
+
+    /**
+     * 设置是否可以编辑
+     *
+     * @param editable
+     */
+    private void setEditable(boolean editable) {
+        this.editable = editable;
+        if (editTexts != null) {
+            if (editable) {
+                for (EditText et : editTexts) {
+                    et.setFocusable(true);
+                    et.setFocusableInTouchMode(true);
+                    et.requestFocus();
+                    et.findFocus();
+                }
+            } else {
+                for (EditText et : editTexts) {
+                    et.setFocusable(false);
+                    et.setFocusableInTouchMode(false);
+                }
+            }
+        }
+        llCommit.setVisibility(editable ? View.VISIBLE : View.GONE);
+    }
+
+    /**
+     * 获取申请保险的信息
+     */
+    private InsuranceClaimInfo getInsuranceClaimInfo() {
+
+        InsuranceClaimInfo insuranceClaimInfo = new InsuranceClaimInfo();
+
+        String payTime = tvPayTime.getText().toString();
+        if (CommonUtils.isNonNull(payTime)) {
+            insuranceClaimInfo.setPayTime(payTime);
+        }
+
+        String costPrice = etCostPrice.getText().toString();
+        if (CommonUtils.isNonNull(costPrice)) {
+            float costPriceValue = Float.valueOf(costPrice);
+            if (costPriceValue > 0) {
+                insuranceClaimInfo.setCostPrice(costPriceValue);
+            }
+        }
+
+        String address = etAddress.getText().toString();
+        if (CommonUtils.isNonNull(address)) {
+            insuranceClaimInfo.setAddress(address);
+        }
+
+        String area = tvArea.getText().toString();
+        if (CommonUtils.isNonNull(area)) {
+            insuranceClaimInfo.setArea(area);
+        }
+
+        if (CommonUtils.isNonNull(fileParams)) {
+
+            File idCardFrontFile = fileParams.get(MapKey.idCardFront);
+            if (FileUtils.isFileExist(idCardFrontFile)) {
+                insuranceClaimInfo.setIdCardFront(idCardFrontFile.getAbsolutePath());
+            }
+
+            File idCardBackFile = fileParams.get(MapKey.idCardBack);
+            if (FileUtils.isFileExist(idCardBackFile)) {
+                insuranceClaimInfo.setIdCardBack(idCardBackFile.getAbsolutePath());
+            }
+
+            File vehicleCertificateFile = fileParams.get(MapKey.vehicleCertificate);
+            if (FileUtils.isFileExist(vehicleCertificateFile)) {
+                insuranceClaimInfo.setVehiclePhoto(vehicleCertificateFile.getAbsolutePath());
+            }
+
+            File vehicleInvoiceFile = fileParams.get(MapKey.vehicleInvoice);
+            if (FileUtils.isFileExist(vehicleInvoiceFile)) {
+                insuranceClaimInfo.setVehicleInvoice(vehicleInvoiceFile.getAbsolutePath());
+            }
+
+            File vehiclePhotoFile = fileParams.get(MapKey.vehiclePhoto);
+            if (FileUtils.isFileExist(vehiclePhotoFile)) {
+                insuranceClaimInfo.setVehiclePhoto(vehiclePhotoFile.getAbsolutePath());
+            }
+        }
+
+        return insuranceClaimInfo;
+    }
+
+    /**
+     * 检查保险理赔信息
+     *
+     * @param insuranceClaimInfo
+     * @return
+     */
+    private boolean checkInsuranceClaimInfo(InsuranceClaimInfo insuranceClaimInfo) {
+
+        String payTime = insuranceClaimInfo.getPayTime();
+        if (CommonUtils.isEmpty(payTime)) {
+            showResMessage(R.string.improve_insurance_no_purchase_date_desc);
+            return false;
+        }
+
+        float costPrice = insuranceClaimInfo.getCostPrice();
+        if (costPrice <= 0) {
+            showResMessage(R.string.improve_insurance_no_purchase_price_desc);
+            return false;
+        }
+
+        String address = insuranceClaimInfo.getAddress();
+        if (CommonUtils.isEmpty(address)) {
+            showResMessage(R.string.improve_insurance_no_address_desc);
+            return false;
+        }
+
+        String area = insuranceClaimInfo.getArea();
+        if (CommonUtils.isEmpty(area)) {
+            showResMessage(R.string.improve_insurance_no_area_desc);
+            return false;
+        }
+
+        if (CommonUtils.isEmpty(fileParams)) {
+            showResMessage(R.string.improve_insurance_no_photo_desc);
+            return false;
+        }
+
+        File idCardFrontFile = fileParams.get(MapKey.idCardFront);
+        if (FileUtils.isFileNonExist(idCardFrontFile)) {
+            showResMessage(R.string.improve_insurance_no_id_card_front_desc);
+            return false;
+        }
+
+        File idCardBackFile = fileParams.get(MapKey.idCardBack);
+        if (FileUtils.isFileNonExist(idCardBackFile)) {
+            showResMessage(R.string.improve_insurance_no_id_card_back_desc);
+            return false;
+        }
+
+        File insuranceSignFile = fileParams.get(MapKey.insuranceSign);
+        if (FileUtils.isFileNonExist(insuranceSignFile)) {
+            showResMessage(R.string.improve_insurance_no_insurance_sign_desc);
+            return false;
+        }
+
+        File vehicleCertificateFile = fileParams.get(MapKey.vehicleCertificate);
+        if (FileUtils.isFileNonExist(vehicleCertificateFile)) {
+            showResMessage(R.string.improve_insurance_no_vehicle_certificate_desc);
+            return false;
+        }
+
+        File vehicleInvoiceFile = fileParams.get(MapKey.vehicleInvoice);
+        if (FileUtils.isFileNonExist(vehicleInvoiceFile)) {
+            showResMessage(R.string.improve_insurance_no_vehicle_invoice_desc);
+            return false;
+        }
+
+        File vehiclePhotoFile = fileParams.get(MapKey.vehiclePhoto);
+        if (FileUtils.isFileNonExist(vehiclePhotoFile)) {
+            showResMessage(R.string.improve_insurance_no_vehicle_photo_desc);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * 显示菜单
+     */
+    public void showActionSheet() {
+        setTheme(R.style.ActionSheetStyle);
+        menuView = new ActionSheet(this);
+        menuView.setCancelButtonTitle("取消");// before add items
+        menuView.addItems("查看大图", "我的相册", "拍照", "删除");
+        menuView.setItemClickListener(this);
+        menuView.setCancelableOnTouchMenuOutside(true);
+        menuView.showMenu();
+    }
+
+    @Override
+    public void onSelectSuccess(String file, String tag) {
+    }
+
+    @Override
+    public void onCompressSuccess(String file, String tag) {
+        // ToastUtil.showMessage(this, "压缩完成：" + key + "," + file.toString());
+        if (fileParams == null) {
+            fileParams = new LinkedHashMap<>();// 文件数据
+        }
+        fileParams.put(tag, new File(file));
+        if (bitmaps == null) {
+            bitmaps = new LinkedHashMap<>();// 缩略图
+        }
+        Bitmap thumbnail = ImageUtil.revitionImageSize(file);
+        bitmaps.put(tag, thumbnail);
+
+        setThumbnail(tag, thumbnail);
+    }
+
+    /**
+     * 设置缩略图
+     *
+     * @param key
+     * @param photo
+     */
+    private void setThumbnail(String key, Bitmap photo) {
+
+        switch (key) {
+
+            case MapKey.idCardFront:
+                ivIdCardFront.setImageBitmap(photo);
+                break;
+            case MapKey.idCardBack:
+                ivIdCardBack.setImageBitmap(photo);
+                break;
+            case MapKey.vehicleCertificate:
+                ivVehicleCertificate.setImageBitmap(photo);
+                break;
+            case MapKey.vehicleInvoice:
+                ivVehicleInvoice.setImageBitmap(photo);
+                break;
+            case MapKey.vehiclePhoto:
+                ivVehiclePhoto.setImageBitmap(photo);
+                break;
+            case MapKey.insuranceSign:
+                ivUserNotice.setImageBitmap(photo);
+                break;
+
+        }
+    }
+
+    @Override
+    public void onImageError() {
+        showResMessage(R.string.load_picture_error);
+    }
+
+    @Override
+    public void onImageError(String tag) {
+        showResMessage(R.string.load_picture_error);
+    }
+
+    /**
+     * 查看大图
+     *
+     * @param imgType
+     */
+    private void viewImg(int imgType) {
+        if (BuildConf.ImageType.IMG_LOCAL == imgType) {
+            String showImgPath = fileParams.get(key).getAbsolutePath();
+            if (!TextUtils.isEmpty(showImgPath)) {
+                Intent intent = new Intent(this, ImageShowerActivity.class);
+                intent.putExtra("type", BuildConf.ImageType.IMG_LOCAL);
+                intent.putExtra("imageUrl", showImgPath);
+                startActivity(intent);
+            }
+        } else if (BuildConf.ImageType.IMG_NETWORK == imgType) {
+            String showImgNetworkPath = imgNetworkPath.get(key);
+            if (!TextUtils.isEmpty(showImgNetworkPath)) {
+                Intent intent = new Intent(this, ImageShowerActivity.class);
+                intent.putExtra("type", BuildConf.ImageType.IMG_NETWORK);
+                intent.putExtra("imageUrl", showImgNetworkPath);
+                startActivity(intent);
+            }
+        }
+    }
+
+    @Override
+    public void onItemClick(int itemPosition) {
+        switch (itemPosition) {
+            case 0:// 查看大图
+                if ((fileParams != null && fileParams.containsKey(key))) {
+                    viewImg(BuildConf.ImageType.IMG_LOCAL);
+                } else if (imgNetworkPath != null && imgNetworkPath.containsKey(key)) {
+                    viewImg(BuildConf.ImageType.IMG_NETWORK);
+                }
+                break;
+            case 1:// 我的相册
+                if (checkSDCard()) {
+                    imageFileSelector.selectImage(this);
+                }
+                break;
+            case 2:// 拍照
+                if (checkSDCard()) {
+                    imageFileSelector.takePhoto(this);
+                }
+                break;
+            case 3://删除
+                if ((bitmaps != null && bitmaps.containsKey(key))) {
+                    bitmaps.remove(key);
+                    Bitmap addPhotoBitmap = bitmaps.get(MapKey.addPhoto);
+                    if (addPhotoBitmap == null) {
+                        addPhotoBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.add_photo);
+                        bitmaps.put(MapKey.addPhoto, addPhotoBitmap);
+                    }
+                    setThumbnail(key, addPhotoBitmap);
+                }
+                break;
+        }
+        menuView.dismissMenu();
+    }
+
+    /**
+     * 判断目录状态
+     *
+     * @return
+     */
+    private boolean checkSDCard() {
+        Boolean checkDir = imageFileSelector.checkDir();
+        if (checkDir == null) {
+            showResMessage(R.string.sd_card_error);
+            checkDir = false;
+        } else if (!checkDir) {
+            showResMessage(R.string.read_data_error);
+        }
+        return checkDir;
+    }
+
+    /**
+     * 回收内容
+     */
+    private void clearThumbnail() {
+        if (bitmaps != null) {
+            for (String key : bitmaps.keySet()) {
+                Bitmap thumbnail = bitmaps.get(key);
+                if (thumbnail != null && !thumbnail.isRecycled()) {
+                    thumbnail.recycle(); // 回收图片所占的内存
+                }
+            }
+        }
+        System.gc(); // 提醒系统及时回收
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+
+    }
+
+    @Override
+    public void afterTextChanged(Editable edt) {
+        String temp = edt.toString();
+        if (CommonUtils.isNonNull(temp)) {
+            int posDot = temp.indexOf(".");
+            if (posDot <= 0) {
+                if (temp.length() >= 6)
+                    edt.delete(5, 6);
+            } else {
+                if (temp.length() - 1 - posDot > 2)
+                    edt.delete(posDot + 3, posDot + 4);
+            }
+        }
+    }
+
+    // 理赔信息类型
+    public static class MapKey {
+        public static final String addPhoto = "addPhoto";// 添加车辆
+        public static final String idCardFront = "idcardFrontFile";// 身份证正面
+        public static final String idCardBack = "idcardBackFile";// 身份证背面
+        public static final String insuranceSign = "insuranceSignFile";// 用户告知书
+        public static final String vehiclePhoto = "carPhotoFile";// 车辆照片
+        public static final String vehicleCertificate = "qualificationFile";// 车辆合格证
+        public static final String vehicleInvoice = "invoiceFile";// 车辆发票
+    }
+}

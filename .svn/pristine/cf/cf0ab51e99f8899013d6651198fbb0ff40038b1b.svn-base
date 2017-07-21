@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:android_custom="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head_back"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:padding="@dimen/little_padding">
+
+        <com.zenchn.electrombile.widget.CircleTextImageView
+            android:id="@+id/iv_head"
+            android:layout_width="105dp"
+            android:layout_height="105dp"
+            android:background="@drawable/head_shape"
+            android:src="@drawable/head"
+            android_custom:citv_border_color="@color/stroke_gray"
+            android_custom:citv_border_width="3dp"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/big_margin"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:orientation="vertical"
+            android:padding="@dimen/little_padding">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="车况"
+                    android:textColor="@color/white"
+                    android:textSize="18sp"/>
+
+                <TextView
+                    android:id="@+id/tv_motor_grade"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/common_margin"
+                    android:text="优"
+                    android:textColor="@color/green_base"
+                    android:textSize="24sp"/>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tv_vehicle_status"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/common_margin"
+                android:text="车况良好，暂无异常"
+                android:textColor="@color/translucent"
+                android:textSize="12sp"/>
+
+            <TextView
+                android:id="@+id/tv_vehicle_suggest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/little_margin"
+                android:text="爱车尚未体检，建议立即体检哦！"
+                android:textColor="@color/translucent"
+                android:textSize="12sp"/>
+
+            <LinearLayout
+                android:id="@+id/ll_vehicle_check"
+                android:layout_width="120dp"
+                android:layout_height="30dp"
+                android:layout_marginTop="@dimen/common_margin"
+                android:background="@drawable/btn_shape_shadow_small"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_vehicle_check_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="立即体检"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="30dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <FrameLayout
+            android:id="@+id/fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+</LinearLayout>

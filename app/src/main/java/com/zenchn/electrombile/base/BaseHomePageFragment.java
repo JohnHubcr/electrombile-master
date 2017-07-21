@@ -1,0 +1,28 @@
+package com.zenchn.electrombile.base;
+
+import com.zenchn.electrombile.entity.LoginInfo;
+import com.zenchn.electrombile.kit.ApplicationKit;
+import com.zenchn.electrombile.ui.view.HomePageView;
+import com.zenchn.electrombile.utils.EquModelUtils;
+
+public abstract class BaseHomePageFragment extends BaseFragment {
+
+    protected LoginInfo loginInfo;
+    protected Boolean isHideFunction;
+    protected HomePageView homePageView;
+
+    @Override
+    public boolean useEventBus() {
+        return true;
+    }
+
+    // 添加用户自定义的设置
+    @Override
+    protected void setBaseBeforeInflater() {
+        homePageView = (HomePageView) defaultView;
+        ApplicationKit applicationKit = ApplicationKit.getInstance();
+        loginInfo = applicationKit.getLoginInfo();// 获取登陆信息
+        isHideFunction = EquModelUtils.isHideFunction(loginInfo.getEquModel());
+    }
+
+}

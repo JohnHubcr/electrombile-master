@@ -1,0 +1,137 @@
+package com.zenchn.electrombile.entity;
+
+import java.io.Serializable;
+
+/**
+ * 作    者：wangr on 2017/3/8 14:40
+ * 描    述：用户理赔信息的描述类
+ * 修订记录：
+ */
+
+public class InsuranceClaimInfo implements Serializable{
+
+    private String payTime;
+    private float costPrice;
+    private String address;//详细地址
+    private String area;// 区域
+
+    private String idCardFront;
+    private String idCardBack;
+    private String qualification;
+    private String vehicleInvoice;//车辆发票
+    private String vehiclePhoto;//车辆照片
+    private String insuranceSign;//用户告知书
+
+    public InsuranceClaimInfo() {
+    }
+
+
+    public InsuranceClaimInfo(String payTime, float costPrice, String address, String area, String idCardFront, String idCardBack, String qualification, String vehicleInvoice, String vehiclePhoto, String insuranceSign) {
+        this.payTime = payTime;
+        this.costPrice = costPrice;
+        this.address = address;
+        this.area = area;
+        this.idCardFront = idCardFront;
+        this.idCardBack = idCardBack;
+        this.qualification = qualification;
+        this.vehicleInvoice = vehicleInvoice;
+        this.vehiclePhoto = vehiclePhoto;
+        this.insuranceSign = insuranceSign;
+    }
+
+    public String getPayTime() {
+        return payTime;
+    }
+
+    public void setPayTime(String payTime) {
+        this.payTime = payTime;
+    }
+
+    public float getCostPrice() {
+        return costPrice;
+    }
+
+    public void setCostPrice(float costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getArea() {
+        return area;
+    }
+
+    public void setArea(String area) {
+        this.area = area;
+    }
+
+    public String getIdCardFront() {
+        return idCardFront;
+    }
+
+    public void setIdCardFront(String idCardFront) {
+        this.idCardFront = idCardFront;
+    }
+
+    public String getIdCardBack() {
+        return idCardBack;
+    }
+
+    public void setIdCardBack(String idCardBack) {
+        this.idCardBack = idCardBack;
+    }
+
+    public String getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(String qualification) {
+        this.qualification = qualification;
+    }
+
+    public String getVehicleInvoice() {
+        return vehicleInvoice;
+    }
+
+    public void setVehicleInvoice(String vehicleInvoice) {
+        this.vehicleInvoice = vehicleInvoice;
+    }
+
+    public String getVehiclePhoto() {
+        return vehiclePhoto;
+    }
+
+    public void setVehiclePhoto(String vehiclePhoto) {
+        this.vehiclePhoto = vehiclePhoto;
+    }
+
+    public String getInsuranceSign() {
+        return insuranceSign;
+    }
+
+    public void setInsuranceSign(String insuranceSign) {
+        this.insuranceSign = insuranceSign;
+    }
+
+    @Override
+    public String toString() {
+        return "InsuranceClaimInfo{" +
+                "payTime='" + payTime + '\'' +
+                ", costPrice=" + costPrice +
+                ", address='" + address + '\'' +
+                ", area='" + area + '\'' +
+                ", idCardFront='" + idCardFront + '\'' +
+                ", idCardBack='" + idCardBack + '\'' +
+                ", qualification='" + qualification + '\'' +
+                ", vehicleInvoice='" + vehicleInvoice + '\'' +
+                ", vehiclePhoto='" + vehiclePhoto + '\'' +
+                ", insuranceSign='" + insuranceSign + '\'' +
+                '}';
+    }
+}

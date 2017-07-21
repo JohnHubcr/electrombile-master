@@ -1,0 +1,247 @@
+package com.zenchn.electrombile.pullparser.bean.ST;
+
+public class ST_MotorHardwareInfo {
+
+    boolean RepairStatus;// 修复状态
+    boolean VehicleState;// 车辆状态
+
+    boolean SpeedLimitedMode;// 限速模式
+    boolean Gear4;// 4档状态
+    boolean Gear3;// 3档状态
+    boolean Gear2;// 2档状态
+    boolean Gear1;// 1档状态
+    boolean ReverseChargeState;// 反充电状态
+    boolean AssistState;// 助力状态/电动状态
+    boolean CruisingState;// 巡航状态
+
+    boolean RealTimeStatus;// 实时状态
+    boolean AntiTheftState;// 防盗状态
+    boolean OvervoltageCondition;// 过压状态
+    boolean UndervoltageProtection;// 欠压状态
+    boolean MotorlockStatus;// 锁电机状态
+    boolean MotorHolzerFault;// 电机霍尔故障
+    boolean BrakeFault;// 刹车故障
+    boolean TurningFault;// 转把故障
+    boolean ControlFault;// 控制器故障
+
+    public ST_MotorHardwareInfo() {
+    }
+
+    public ST_MotorHardwareInfo(boolean repairStatus, boolean vehicleState, boolean speedLimitedMode, boolean gear4, boolean gear3, boolean gear2, boolean gear1, boolean reverseChargeState, boolean assistState, boolean cruisingState, boolean realTimeStatus, boolean antiTheftState, boolean overvoltageCondition, boolean undervoltageProtection, boolean motorlockStatus, boolean motorHolzerFault, boolean brakeFault, boolean turningFault, boolean controlFault) {
+        RepairStatus = repairStatus;
+        VehicleState = vehicleState;
+        SpeedLimitedMode = speedLimitedMode;
+        Gear4 = gear4;
+        Gear3 = gear3;
+        Gear2 = gear2;
+        Gear1 = gear1;
+        ReverseChargeState = reverseChargeState;
+        AssistState = assistState;
+        CruisingState = cruisingState;
+        RealTimeStatus = realTimeStatus;
+        AntiTheftState = antiTheftState;
+        OvervoltageCondition = overvoltageCondition;
+        UndervoltageProtection = undervoltageProtection;
+        MotorlockStatus = motorlockStatus;
+        MotorHolzerFault = motorHolzerFault;
+        BrakeFault = brakeFault;
+        TurningFault = turningFault;
+        ControlFault = controlFault;
+    }
+
+    public int getTroubleCount() {
+        int troubleCount = 0;
+        if (ControlFault)
+            troubleCount++;
+        if (TurningFault)
+            troubleCount++;
+        if (BrakeFault)
+            troubleCount++;
+        if (MotorHolzerFault)
+            troubleCount++;
+        if (MotorlockStatus)
+            troubleCount++;
+        if (UndervoltageProtection)
+            troubleCount++;
+        if (OvervoltageCondition)
+            troubleCount++;
+        return troubleCount;
+    }
+
+    public boolean isRepairStatus() {
+        return RepairStatus;
+    }
+
+    public void setRepairStatus(boolean repairStatus) {
+        RepairStatus = repairStatus;
+    }
+
+    public boolean isVehicleState() {
+        return VehicleState;
+    }
+
+    public void setVehicleState(boolean vehicleState) {
+        VehicleState = vehicleState;
+    }
+
+    public boolean isSpeedLimitedMode() {
+        return SpeedLimitedMode;
+    }
+
+    public void setSpeedLimitedMode(boolean speedLimitedMode) {
+        SpeedLimitedMode = speedLimitedMode;
+    }
+
+    public boolean isGear4() {
+        return Gear4;
+    }
+
+    public void setGear4(boolean gear4) {
+        Gear4 = gear4;
+    }
+
+    public boolean isGear3() {
+        return Gear3;
+    }
+
+    public void setGear3(boolean gear3) {
+        Gear3 = gear3;
+    }
+
+    public boolean isGear2() {
+        return Gear2;
+    }
+
+    public void setGear2(boolean gear2) {
+        Gear2 = gear2;
+    }
+
+    public boolean isGear1() {
+        return Gear1;
+    }
+
+    public void setGear1(boolean gear1) {
+        Gear1 = gear1;
+    }
+
+    public boolean isReverseChargeState() {
+        return ReverseChargeState;
+    }
+
+    public void setReverseChargeState(boolean reverseChargeState) {
+        ReverseChargeState = reverseChargeState;
+    }
+
+    public boolean isAssistState() {
+        return AssistState;
+    }
+
+    public void setAssistState(boolean assistState) {
+        AssistState = assistState;
+    }
+
+    public boolean isCruisingState() {
+        return CruisingState;
+    }
+
+    public void setCruisingState(boolean cruisingState) {
+        CruisingState = cruisingState;
+    }
+
+    public boolean isRealTimeStatus() {
+        return RealTimeStatus;
+    }
+
+    public void setRealTimeStatus(boolean realTimeStatus) {
+        RealTimeStatus = realTimeStatus;
+    }
+
+    public boolean isAntiTheftState() {
+        return AntiTheftState;
+    }
+
+    public void setAntiTheftState(boolean antiTheftState) {
+        AntiTheftState = antiTheftState;
+    }
+
+    public boolean isOvervoltageCondition() {
+        return OvervoltageCondition;
+    }
+
+    public void setOvervoltageCondition(boolean overvoltageCondition) {
+        OvervoltageCondition = overvoltageCondition;
+    }
+
+    public boolean isUndervoltageProtection() {
+        return UndervoltageProtection;
+    }
+
+    public void setUndervoltageProtection(boolean undervoltageProtection) {
+        UndervoltageProtection = undervoltageProtection;
+    }
+
+    public boolean isMotorlockStatus() {
+        return MotorlockStatus;
+    }
+
+    public void setMotorlockStatus(boolean motorlockStatus) {
+        MotorlockStatus = motorlockStatus;
+    }
+
+    public boolean isMotorHolzerFault() {
+        return MotorHolzerFault;
+    }
+
+    public void setMotorHolzerFault(boolean motorHolzerFault) {
+        MotorHolzerFault = motorHolzerFault;
+    }
+
+    public boolean isBrakeFault() {
+        return BrakeFault;
+    }
+
+    public void setBrakeFault(boolean brakeFault) {
+        BrakeFault = brakeFault;
+    }
+
+    public boolean isTurningFault() {
+        return TurningFault;
+    }
+
+    public void setTurningFault(boolean turningFault) {
+        TurningFault = turningFault;
+    }
+
+    public boolean isControlFault() {
+        return ControlFault;
+    }
+
+    public void setControlFault(boolean controlFault) {
+        ControlFault = controlFault;
+    }
+
+    @Override
+    public String toString() {
+        return 	(ControlFault?"控制器故障"+"\n":"")+
+                (TurningFault?"转把故障"+"\n":"")+
+                (BrakeFault?"刹车故障"+"\n":"")+
+                (MotorHolzerFault?"电机霍尔故障"+"\n":"")+
+                (MotorlockStatus?"电机被锁死":"正常工作状态")+"\n"+
+                (UndervoltageProtection?"欠压状态":"非欠压状态")+"\n"+
+                (OvervoltageCondition?"过压状态 ":"非过压状态")+"\n"+
+                (AntiTheftState?"发生震动或移动":"无震动或移动")+"\n"+
+
+                (RealTimeStatus?"运行状态":"静止状态")+"\n"+
+                (CruisingState?"巡航状态":"非巡航状态")+"\n"+
+                (AssistState?"电动状态":"助力状态")+"\n"+
+                (ReverseChargeState?"反充电状态":"非反充电状态")+"\n"+
+                (Gear1?"档位 1 "+"\n":"")+
+                (Gear2?"档位 2 "+"\n":"")+
+                (Gear3?"档位 3 "+"\n":"")+
+                (Gear4?"档位 4 "+"\n":"")+
+
+                (SpeedLimitedMode?"限速状态":"非限速状态")+"\n"+
+                (VehicleState?"正常状态":"故障状态")+"\n"+
+                (RepairStatus?"故障修复状态":"");
+    }
+}

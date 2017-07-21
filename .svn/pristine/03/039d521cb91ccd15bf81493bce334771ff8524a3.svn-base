@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:android_custon="http://schemas.android.com/apk/res-auto"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+
+    <com.zenchn.electrombile.widget.NumberProgressbar.NumberProgressBar
+        android:id="@+id/update_progress"
+        android_custon:progress_text_color="@color/ios_text_color_blue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/common_padding"
+        android:layout_marginLeft="@dimen/small_padding"
+        android:layout_marginRight="@dimen/small_padding"
+        android:layout_marginTop="@dimen/common_padding">
+    </com.zenchn.electrombile.widget.NumberProgressbar.NumberProgressBar>
+
+</LinearLayout>

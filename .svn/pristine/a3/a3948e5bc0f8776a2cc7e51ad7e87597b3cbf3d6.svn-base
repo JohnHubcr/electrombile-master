@@ -1,0 +1,95 @@
+package com.zenchn.electrombile.ui.fragment;
+
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.adapter.CheckSubjectAdapter;
+import com.zenchn.electrombile.adapter.bean.CheckSubjectInfo;
+import com.zenchn.electrombile.base.BaseFragment;
+import com.zenchn.electrombile.widget.RecyclerView.decoration.SimpleDecoration;
+import com.zenchn.electrombile.widget.RecyclerView.wrapper.ScanWrapperAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+
+/**
+ * 作    者：wangr on 2017/2/24 15:40
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleCheckJKFragment extends BaseFragment {
+
+    @BindView(R.id.rv)
+    RecyclerView rv;
+
+    private final static String[] TITLES = new String[]{
+            "ECU",
+            "仪表盘",
+            "充电器",
+            "电池",
+            "控制器",
+            "电子控制单元"};
+
+    private final static int[] ICONS = new int[]{
+            R.drawable.gyro,
+            R.drawable.dash,
+            R.drawable.charger,
+            R.drawable.battery,
+            R.drawable.controller,
+            R.drawable.ecu};
+
+    private ScanWrapperAdapter wrapperAdapter;
+    private List<CheckSubjectInfo> mData;
+
+    public VehicleCheckJKFragment() {
+        mData = new ArrayList<>();
+
+        for (int i = 0; i < TITLES.length; i++) {
+            mData.add(new CheckSubjectInfo(TITLES[i], ICONS[i], false));
+        }
+    }
+
+    @Override
+    protected String getTitle() {
+        return null;
+    }
+
+    @Override
+    protected int getContentLayoutRes() {
+        return R.layout.fragment_vehicle_check_jk;
+    }
+
+    @Override
+    protected void initData() {
+        initRecycleView();
+    }
+
+    private void initRecycleView() {
+
+        //设置布局管理器
+        rv.setLayoutManager(new GridLayoutManager(getActivity(), 4));
+//        rv.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        //设置adapter
+        wrapperAdapter = new ScanWrapperAdapter(new CheckSubjectAdapter(getActivity(), mData));
+        rv.setAdapter(wrapperAdapter);
+
+        //设置Item增加、移除动画
+        rv.setItemAnimator(new DefaultItemAnimator());
+
+        //添加分割线
+        rv.addItemDecoration(new SimpleDecoration(getActivity(), SimpleDecoration.VERTICAL_LIST));
+
+    }
+
+    @Override
+    public boolean useEventBus() {
+        return true;
+    }
+
+
+}

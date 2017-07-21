@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="94dp"
+        android:layout_marginTop="@dimen/little_margin"
+        android:background="@drawable/card_shape">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:id="@+id/ll_left"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:paddingLeft="@dimen/common_padding">
+
+                <TextView
+                    android:id="@+id/tv_insurance_title"
+                    style="@style/BaseTextViewStyle"
+                    android:text="车联网服务+盗抢服务"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"/>
+
+                <TextView
+                    android:id="@+id/tv_insurance_desc"
+                    style="@style/BaseTextViewStyle"
+                    android:layout_marginTop="@dimen/little_margin"
+                    android:text="最高可赔购车金80%"
+                    android:textColor="@color/translucent"
+                    android:textSize="12sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_right"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:paddingLeft="@dimen/common_padding"
+                android:paddingRight="@dimen/common_padding"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="right|center_vertical"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            style="@style/BaseTextViewStyle"
+                            android:text="￥"
+                            android:textColor="@color/base_text_color_light"/>
+
+                        <TextView
+                            android:id="@+id/tv_insurance_price"
+                            style="@style/BaseTextViewStyle"
+                            android:text="50"
+                            android:textColor="@color/base_text_color_light"
+                            android:textSize="24sp"/>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tv_insurance_price_old"
+                            style="@style/BaseTextViewStyle"
+                            android:text="原价：￥60"
+                            android:textSize="9sp"/>
+
+                    </LinearLayout>
+
+                </LinearLayout>
+
+                <View
+                    android:layout_width="2px"
+                    android:layout_height="36dp"
+                    android:layout_marginLeft="@dimen/little_margin"
+                    android:layout_marginRight="@dimen/little_margin"
+                    android:background="@color/button_normal_bg"/>
+
+                <LinearLayout
+                    android:layout_width="58dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/btn_shape_shadow_small"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:ems="6"
+                        android:gravity="center"
+                        android:text="开通"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"/>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </RelativeLayout>
+
+</LinearLayout>

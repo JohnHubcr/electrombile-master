@@ -1,0 +1,129 @@
+package com.zenchn.electrombile.kit;
+
+import android.net.Uri;
+import android.support.annotation.NonNull;
+
+import com.alibaba.fastjson.JSONObject;
+import com.zenchn.electrombile.BuildConf;
+
+import java.io.File;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
+import retrofit2.converter.scalars.ScalarsConverterFactory;
+
+/**
+ * 作    者：wangr on 2017/2/21 15:56
+ * 描    述：Retrofit封装类
+ * 修订记录：
+ */
+
+public class RetrofitKit {
+
+    private Retrofit retrofit;
+
+    private RetrofitKit() {
+        retrofit = new Retrofit.Builder()
+                .baseUrl(BuildConf.BASE_REQUEST_HTTP_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create())
+                .client(getDefaultOkHttpClient())
+                .build();
+    }
+
+    private static class SingletonInstance {
+        private static final RetrofitKit INSTANCE = new RetrofitKit();
+    }
+
+    public static RetrofitKit getInstance() {
+        return SingletonInstance.INSTANCE;
+    }
+
+    @NonNull
+    private static OkHttpClient getDefaultOkHttpClient() {
+        return new OkHttpClient
+                .Builder()
+                .addInterceptor(new LoggerInterceptor("Retrofit"))
+                .connectTimeout(15000L, TimeUnit.MILLISECONDS)
+                .writeTimeout(15000L, TimeUnit.MILLISECONDS)
+                .readTimeout(15000L, TimeUnit.MILLISECONDS)
+                .build();
+    }
+
+    public static Retrofit getLongTimeoutRetrofit(long timeout) {
+        timeout = timeout > 0 ? timeout : 30000L;
+        return new Retrofit.Builder()
+                .baseUrl(BuildConf.BASE_REQUEST_HTTP_URL)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .client(new OkHttpClient
+                        .Builder()
+                        .addInterceptor(new LoggerInterceptor("Retrofit"))
+                        .connectTimeout(timeout, TimeUnit.MILLISECONDS)
+                        .writeTimeout(timeout, TimeUnit.MILLISECONDS)
+                        .readTimeout(timeout, TimeUnit.MILLISECONDS)
+                        .build())
+                .build();
+    }
+
+    public <T> T create(Class<T> service) {
+        return retrofit.create(service);
+    }
+
+    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+
+    @NonNull
+    private RequestBody createPartFromString(String descriptionString) {
+        return RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), descriptionString);
+    }
+
+    @NonNull
+    private MultipartBody.Part prepareFilePart(String partName, Uri fileUri) {
+
+        File file = new File(fileUri.getPath());
+
+        // 为file建立RequestBody实例
+        RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
+
+        // MultipartBody.Part借助文件名完成最终的上传
+        return MultipartBody.Part.createFormData(partName, file.getName(), requestFile);
+    }
+
+    /**
+     * 创建一个请求体
+     *
+     * @param jsonString
+     * @return
+     */
+    public static RequestBody createRequestBody(String jsonString) {
+        return RequestBody.create(MediaType.parse("application/json"), jsonString);
+    }
+
+    /**
+     * 创建一个请求体
+     *
+     * @param jsonObject
+     * @return
+     */
+    public static RequestBody createRequestBody(JSONObject jsonObject) {
+        return RequestBody.create(MediaType.parse("application/json"), jsonObject.toJSONString());
+    }
+
+    /**
+     * 创建一个请求体
+     *
+     * @param params
+     * @return
+     */
+    public static RequestBody createRequestBody(Map<String, Object> params) {
+        return RequestBody.create(MediaType.parse("application/json"), new JSONObject(params).toJSONString());
+    }
+}

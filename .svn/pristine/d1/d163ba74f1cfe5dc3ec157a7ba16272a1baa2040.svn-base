@@ -1,0 +1,364 @@
+package com.zenchn.electrombile.ui.activity;
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.BuildConf;
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.app.Constants;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.entity.FeedbackInfo;
+import com.zenchn.electrombile.presenter.FeedbackPresenter;
+import com.zenchn.electrombile.presenter.impl.FeedbackPresenterImpl;
+import com.zenchn.electrombile.ui.view.FeedbackView;
+import com.zenchn.electrombile.utils.CommonUtils;
+import com.zenchn.electrombile.utils.imageUtils.ImageFileSelector;
+import com.zenchn.electrombile.utils.imageUtils.ImageUtil;
+import com.zenchn.electrombile.widget.ActionSheet;
+import com.zenchn.electrombile.wrapper.ACacheWrapper;
+import com.zenchn.mlibrary.utils.DateUtils;
+import com.zenchn.mlibrary.utils.FileUtils;
+import com.zenchn.mlibrary.utils.ToastUtils;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 作    者：wangr on 2017/2/22 14:59
+ * 描    述：用户反馈的页面
+ * 修订记录：
+ */
+public class FeedbackActivity extends BaseActivity implements FeedbackView, OnClickListener, TextWatcher, ImageFileSelector.ImageFilesCallback, ActionSheet.MenuItemClickListener {
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.et_feedback)
+    EditText etFeedback;
+    @BindView(R.id.tv_residual)
+    TextView tvResidual;
+    @BindView(R.id.tv_auto_save)
+    TextView tvAutoSave;
+    @BindView(R.id.iv_upload_pic)
+    ImageView ivUploadPic;
+    @BindView(R.id.et_number)
+    EditText etNumber;
+
+    private final String KEY_FEEDBACK_PIC_FILE = "KEY_FEEDBACK_PIC_FILE";
+    private int feedbackMaxLength = 200;//最大数量
+
+    private FeedbackPresenter presenter;
+    private ImageFileSelector imageFileSelector;
+    private boolean isFirst = true;
+    private ActionSheet menuView;
+
+    private String uploadPicFilePath;
+    private String oldContent;
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isFirst)
+            return;
+        presenter.autoSaveContent(true);
+    }
+
+    @Override
+    protected void onPause() {
+        presenter.autoSaveContent(false);
+        super.onPause();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    public FeedbackActivity() {
+        this.presenter = new FeedbackPresenterImpl(this);
+        this.imageFileSelector = new ImageFileSelector(this);
+    }
+
+    @Override
+    public boolean useUiHandler() {
+        return true;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_user_feedback;
+    }
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        addListener();
+        initData();
+        initTempFolder();
+        initImageConfig();
+    }
+
+    protected void addListener() {
+        etFeedback.addTextChangedListener(this);
+    }
+
+    protected void initData() {
+        tvTitle.setText(getString(R.string.title_feed_back));
+        recoverSave();//恢复已经填写的内容
+    }
+
+    private void recoverSave() {
+        FeedbackInfo feedbackInfo = ACacheWrapper.getFeedbackInfo();
+
+        if (feedbackInfo != null) {
+
+            if (CommonUtils.isNonNull(feedbackInfo.getFeedbackContent())) {
+                String feedbackContent = feedbackInfo.getFeedbackContent();
+                etFeedback.setText(feedbackContent);
+                etFeedback.setSelection(feedbackContent.length());
+                tvAutoSave.setText(getString(R.string.recover_save_feedback));
+            }
+
+            if (CommonUtils.isNonNull(feedbackInfo.getContactNumber())) {
+                String contactNumber = feedbackInfo.getContactNumber();
+                etNumber.setText(contactNumber);
+                etNumber.setSelection(contactNumber.length());
+            }
+
+            if (CommonUtils.isNonNull(feedbackInfo.getFeedbackImage())) {
+                String feedbackImage = feedbackInfo.getFeedbackImage();
+                this.uploadPicFilePath = feedbackImage;
+                Bitmap thumbnail = ImageUtil.revitionImageSize(uploadPicFilePath);
+                setThumbnail(thumbnail);
+            }
+        }
+    }
+
+    /**
+     * 检查缓存图片的文件夹
+     */
+    private void initTempFolder() {
+        if (!FileUtils.isFolderExist(Constants.appFolder)) {// 判断文件目录是否存在
+            FileUtils.createFolder(Constants.appFolder);
+        }
+    }
+
+    /**
+     * 设置图片工具类的配置
+     */
+    private void initImageConfig() {
+        imageFileSelector.setQuality(80);
+        imageFileSelector.setCallback(this);
+        imageFileSelector.setDelete(false);
+    }
+
+    @OnClick({R.id.ll_back, R.id.tv_save, R.id.ll_upload_pic, R.id.ll_commit})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ll_back:
+                onBackPressed();
+                break;
+
+            case R.id.tv_save:
+                presenter.autoSaveContent(false);
+                saveFeedbackInfo();
+                break;
+
+            case R.id.ll_upload_pic:
+                showActionSheet();
+                break;
+
+            case R.id.ll_commit:
+                uploadFeedback();
+                break;
+        }
+    }
+
+    /**
+     * 显示菜单
+     */
+    public void showActionSheet() {
+        setTheme(R.style.ActionSheetStyle);
+        menuView = new ActionSheet(this);
+        menuView.setCancelButtonTitle("取消");// before add items
+        menuView.addItems("查看大图", "我的相册", "拍照", "删除");
+        menuView.setItemClickListener(this);
+        menuView.setCancelableOnTouchMenuOutside(true);
+        menuView.showMenu();
+    }
+
+    @Override
+    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+    }
+
+    @Override
+    public void onTextChanged(CharSequence s, int start, int before, int count) {
+        String content = etFeedback.getText().toString();
+        if (isFirst && !content.equals(oldContent)) {
+            isFirst = false;
+            tvAutoSave.setText("");
+            presenter.autoSaveContent(true);
+        }
+        int i = feedbackMaxLength - content.length();
+        i = i < 0 ? 0 : i;
+        tvResidual.setText("还可以输入" + i + "字");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        imageFileSelector.onActivityResult(requestCode, resultCode, KEY_FEEDBACK_PIC_FILE, data);
+    }
+
+    @Override
+    public void afterTextChanged(Editable s) {
+    }
+
+    @Override
+    public void onBackPressed() {
+        showProgress();
+        mHandler.postDelayed(new Runnable() {
+
+            @Override
+            public void run() {
+                saveFeedbackInfo();
+                hideProgress();
+            }
+        }, 200);
+        super.onBackPressed();
+    }
+
+    public void uploadFeedback() {
+        String feedback = etFeedback.getText().toString();
+        if (CommonUtils.isEmpty(feedback)) {
+            showResMessage(R.string.no_feedback_content);
+        } else if (CommonUtils.isEmpty(uploadPicFilePath) || !FileUtils.isFileExist(uploadPicFilePath)) {
+            showResMessage(R.string.no_feedback_pic);
+        } else {
+            String sessionId = loginInfo.getAccessToken();
+            presenter.uploadFeedback(sessionId, getFeedbackInfo());
+        }
+    }
+
+    @Override
+    public void saveFeedbackInfo() {
+        ACacheWrapper.saveFeedbackInfo(getFeedbackInfo());
+        tvAutoSave.setText((DateUtils.getCurrentTime("yyyy-MM-dd HH:mm:ss") + " 自动保存"));
+    }
+
+    @NonNull
+    private FeedbackInfo getFeedbackInfo() {
+        FeedbackInfo feedbackInfo = new FeedbackInfo(etFeedback.getText().toString());
+        feedbackInfo.setFeedbackImage(uploadPicFilePath);
+        feedbackInfo.setContactNumber(etNumber.getText().toString());
+        return feedbackInfo;
+    }
+
+    @Override
+    public void clearCache() {
+        ACacheWrapper.removeFeedbackInfo();
+    }
+
+    @Override
+    public void navigateToSetting() {
+        finish();
+    }
+
+    @Override
+    public void showSuccess() {
+        ToastUtils.showDefaultMessage(getApplicationContext(), getString(R.string.feedback_success));
+    }
+
+    @Override
+    public void onSelectSuccess(String file, String tag) {
+    }
+
+    @Override
+    public void onCompressSuccess(String file, String tag) {
+        this.uploadPicFilePath = file;
+        Bitmap thumbnail = ImageUtil.revitionImageSize(file);
+        setThumbnail(thumbnail);
+    }
+
+    /**
+     * 设置缩略图
+     *
+     * @param photo
+     */
+    private void setThumbnail(Bitmap photo) {
+        ivUploadPic.setImageBitmap(photo);
+    }
+
+    @Override
+    public void onImageError() {
+        showResMessage(R.string.load_picture_error);
+    }
+
+    @Override
+    public void onImageError(String tag) {
+        showResMessage(R.string.load_picture_error);
+    }
+
+    /**
+     * 查看大图
+     */
+    private void viewImg() {
+        if (!TextUtils.isEmpty(uploadPicFilePath)) {
+            Intent intent = new Intent(this, ImageShowerActivity.class);
+            intent.putExtra("type", BuildConf.ImageType.IMG_LOCAL);
+            intent.putExtra("imageUrl", uploadPicFilePath);
+            startActivity(intent);
+        }
+    }
+
+    /**
+     * 判断目录状态
+     *
+     * @return
+     */
+    private boolean checkSDCard() {
+        Boolean checkDir = imageFileSelector.checkDir();
+        if (checkDir == null) {
+            showResMessage(R.string.sd_card_error);
+            checkDir = false;
+        } else if (!checkDir) {
+            showResMessage(R.string.read_data_error);
+        }
+        return checkDir;
+    }
+
+    @Override
+    public void onItemClick(int itemPosition) {
+        switch (itemPosition) {
+            case 0:// 查看大图
+                viewImg();
+                break;
+            case 1:// 我的相册
+                if (checkSDCard()) {
+                    imageFileSelector.selectImage(this);
+                }
+                break;
+            case 2:// 拍照
+                if (checkSDCard()) {
+                    imageFileSelector.takePhoto(this);
+                }
+                break;
+            case 3:// 删除
+                uploadPicFilePath = null;
+                ivUploadPic.setImageResource(R.drawable.add_photo);
+                break;
+        }
+        menuView.dismissMenu();
+    }
+
+}

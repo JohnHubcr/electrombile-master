@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/in_head"
+            layout="@layout/include_top_head_back"/>
+
+        <TextView
+            android:id="@+id/tv_save"
+            style="@style/HeadTitleRightTextViewStyle"
+            android:layout_width="70dp"
+            android:layout_alignParentRight="true"
+            android:text="存草稿"/>
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/BaseTextViewDescStyle"
+                android:layout_margin="@dimen/little_padding"
+                android:text="问题和意见"
+                android:textSize="12sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/module_normal_bg"
+                android:orientation="vertical"
+                android:padding="@dimen/little_padding">
+
+                <EditText
+                    android:id="@+id/et_feedback"
+                    style="@style/BaseEditTextClearStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:ems="120"
+                    android:gravity="top"
+                    android:hint="请简要描述您的问题和建议~"
+                    android:lines="6"
+                    android:textColor="@color/white"
+                    android:textColorHint="#99666666"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/common_margin"
+                android:layout_marginTop="@dimen/small_margin"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingLeft="@dimen/little_padding"
+                android:paddingRight="@dimen/little_padding">
+
+                <TextView
+                    android:id="@+id/tv_residual"
+                    style="@style/BaseTextViewDescStyle"
+                    android:text="还可以输入120字"
+                    android:textColor="#99999999"
+                    android:textSize="12sp"/>
+
+                <TextView
+                    android:id="@+id/tv_auto_save"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="right"
+                    android:textColor="#99999999"
+                    android:textSize="12sp"/>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/small_margin"
+                android:layout_marginTop="@dimen/small_margin"
+                android:background="@color/module_normal_bg"
+                android:gravity="center_vertical"
+                android:orientation="vertical"
+                android:padding="@dimen/common_padding">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="图片（选填，提供问题截图）"
+                    android:textColor="@color/translucent"
+                    android:textSize="14sp"/>
+
+                <LinearLayout
+                    android:id="@+id/ll_upload_pic"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/common_margin">
+
+                    <LinearLayout
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:background="@drawable/pic_shape"
+                        android:gravity="center"
+                        android:padding="2dp">
+
+                        <ImageView
+                            android:id="@+id/iv_upload_pic"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:src="@drawable/add_photo"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                style="@style/BaseTextViewDescStyle"
+                android:layout_margin="@dimen/little_margin"
+                android:text="联系电话"
+                android:textSize="12sp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="53dp"
+                android:background="@color/module_normal_bg"
+                android:gravity="center_vertical"
+                android:padding="@dimen/common_padding">
+
+                <EditText
+                    android:id="@+id/et_number"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@null"
+                    android:hint="选填，方便我们及时联系你"
+                    android:inputType="number"
+                    android:singleLine="true"
+                    android:textColor="@color/base_text_color_gray"
+                    android:textColorHint="@color/base_text_color_tint_grey"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/ll_commit"
+                style="@style/GradientButtonStyle"
+                android:layout_marginTop="20dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="提交"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

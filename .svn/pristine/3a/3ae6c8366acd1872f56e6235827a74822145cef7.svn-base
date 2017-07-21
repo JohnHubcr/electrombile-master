@@ -1,0 +1,111 @@
+package com.zenchn.electrombile.adapter;
+
+import android.app.Activity;
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.entity.CheckSubjectInfo;
+import com.zenchn.electrombile.widget.AnimationFactory;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+/**
+ * Created by wangr on 2016/11/22.
+ */
+public class CheckSubjectAdapter extends BaseAdapter {
+
+    private Context mContext;
+    private List subjects;
+    private int circlePosition;
+    private int duration;
+
+
+    public CheckSubjectAdapter(List subjects, int circlePosition, int duration, Activity activity) {
+        this.subjects = subjects;
+        this.circlePosition = circlePosition;
+        this.duration = duration;
+        this.mContext = activity;
+    }
+
+    @Override
+    public int getCount() {
+        return subjects != null ? subjects.size() : 0;
+    }
+
+    @Override
+    public Object getItem(int position) {
+        return subjects != null ? subjects.get(position) : null;
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder viewHolder = null;
+        if (convertView == null) {
+            convertView = LayoutInflater.from(mContext).inflate(R.layout.gv_check_subject_item, null);
+            viewHolder = new ViewHolder(convertView);
+            convertView.setTag(viewHolder);
+        } else {
+            viewHolder = (ViewHolder) convertView.getTag();
+        }
+
+        CheckSubjectInfo checkSubjectInfo = (CheckSubjectInfo) subjects.get(position);
+        viewHolder.tvCheckSubjectTitle.setText(checkSubjectInfo.getTitle());
+        viewHolder.ivCheckSubjectIcon.setImageResource(checkSubjectInfo.getIconId());
+
+        final Boolean hasTrouble = checkSubjectInfo.getHasTrouble();
+
+        final ImageView ivCheckSubjectResult = viewHolder.ivCheckSubjectResult;
+
+        if (hasTrouble == null) {
+            ivCheckSubjectResult.setVisibility(View.INVISIBLE);
+        } else {
+            if (position < circlePosition) {
+                ivCheckSubjectResult.setVisibility(View.VISIBLE);
+                ivCheckSubjectResult.setImageResource(hasTrouble ? R.drawable.check_error : R.drawable.check_ok);
+            } else if (position == circlePosition) {
+                final ImageView ivCheckSubjectCircle = viewHolder.ivCheckSubjectCircle;
+                ivCheckSubjectCircle.setVisibility(View.VISIBLE);
+                AnimationFactory.showCircleView(ivCheckSubjectCircle, duration, new AnimationFactory.onOnAnimationEndListener() {
+
+                    @Override
+                    public void onOnAnimationEnd() {
+                        ivCheckSubjectCircle.setVisibility(View.INVISIBLE);
+                        ivCheckSubjectResult.setVisibility(View.VISIBLE);
+                        ivCheckSubjectResult.setImageResource(hasTrouble ? R.drawable.check_error : R.drawable.check_ok);
+                    }
+                });
+
+            }
+        }
+        return convertView;
+    }
+
+    static class ViewHolder {
+        @BindView(R.id.iv_check_subject_circle)
+        ImageView ivCheckSubjectCircle;
+        @BindView(R.id.iv_check_subject_icon)
+        ImageView ivCheckSubjectIcon;
+        @BindView(R.id.tv_check_subject_title)
+        TextView tvCheckSubjectTitle;
+        @BindView(R.id.iv_check_subject_result)
+        ImageView ivCheckSubjectResult;
+
+        ViewHolder(View view) {
+            ButterKnife.bind(this, view);
+        }
+    }
+}

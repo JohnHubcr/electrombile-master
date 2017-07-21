@@ -1,0 +1,120 @@
+package com.zenchn.electrombile.ui.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.adapter.ContactsAdapter;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.adapter.bean.ContactInfo;
+import com.zenchn.electrombile.presenter.ChooseContactPresenter;
+import com.zenchn.electrombile.presenter.impl.ChooseContactPresenterImpl;
+import com.zenchn.electrombile.ui.view.ChooseContactView;
+import com.zenchn.electrombile.widget.RecyclerView.listener.OnItemClickListener;
+import com.zenchn.electrombile.widget.RecyclerView.decoration.SimpleDecoration;
+import com.zenchn.mlibrary.utils.MobileUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 作    者：wangr on 2017/2/22 18:29
+ * 描    述：
+ * 修订记录：
+ */
+public class ChooseContactsActivity extends BaseActivity implements ChooseContactView, OnItemClickListener {
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.rv)
+    RecyclerView rv;
+
+    private ChooseContactPresenter presenter;
+    private ContactsAdapter adapter;
+    private List<ContactInfo> mData;
+
+    @Override
+    protected void onDestroy() {
+        presenter.onDestroy();
+        super.onDestroy();
+    }
+
+    public ChooseContactsActivity() {
+        presenter = new ChooseContactPresenterImpl(this);
+    }
+
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        initRecycleView();
+        initData();
+    }
+
+    private void initRecycleView() {
+        //设置布局管理器
+        rv.setLayoutManager(new LinearLayoutManager(this));
+        //设置adapter
+        rv.setAdapter(adapter = new ContactsAdapter(this, mData = new ArrayList<>(), this));
+        //设置Item增加、移除动画
+        rv.setItemAnimator(new DefaultItemAnimator());
+        //添加分割线
+        rv.addItemDecoration(new SimpleDecoration(this, SimpleDecoration.VERTICAL_LIST));
+    }
+
+    @Override
+    protected void initData() {
+        tvTitle.setText(R.string.title_choose_contacts);
+        presenter.queryContacts();
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_contacts;
+    }
+
+    @OnClick(R.id.ll_back)
+    public void onClick() {
+        onBackPressed();
+    }
+
+    @Override
+    public boolean useUiHandler() {
+        return true;
+    }
+
+    @Override
+    public void onItemChoose(int position, Object object) {
+        ContactInfo contactInfo = (ContactInfo) object;
+        Intent data = new Intent();
+        data.putExtra("mobilePhone", MobileUtils.replaceBlank(contactInfo.getPhone()));
+        setResult(RESULT_OK, data);
+        finish();
+    }
+
+    @Override
+    public void addContacts(ContactInfo contactInfo) {
+        if (mData != null)
+            mData.add(contactInfo);
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                adapter.notifyDataSetChanged();
+            }
+        }, 500);
+    }
+
+    @Override
+    public void onQueryCompleted() {
+        if (mData == null || mData.isEmpty()) {
+            showResMessage(R.string.read_local_contacts_empty);
+            onBackPressed();
+        }
+    }
+}

@@ -1,0 +1,125 @@
+package com.zenchn.electrombile.ui.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.BuildConf;
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.Constants;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.entity.model.InsuranceStatusEnum;
+import com.zenchn.electrombile.utils.CommonUtils;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 作    者：wangr on 2017/3/8 13:04
+ * 描    述：保险审核中的界面
+ * 修订记录：
+ */
+public class InsuranceApplyStatusActivity extends BaseActivity {
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.iv_result)
+    ImageView ivResult;
+    @BindView(R.id.tv_result)
+    TextView tvResult;
+    @BindView(R.id.tv_content)
+    TextView tvContent;
+    @BindView(R.id.ll_submit)
+    LinearLayout llSubmit;
+    @BindView(R.id.tv_insurance_improve)
+    TextView tvInsuranceImprove;
+
+    private int protectionStatus;
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        initData();
+    }
+
+    protected void initData() {
+        tvTitle.setText(getString(R.string.title_apply_status));
+        protectionStatus = getIntent().getIntExtra("protectionStatus", InsuranceStatusEnum.审核中.ordinal());
+        showApplyStatus(InsuranceStatusEnum.classifyInsuranceStatus(protectionStatus));
+    }
+
+    /**
+     * 显示审核状态
+     *
+     * @param insuranceStatusEnum
+     */
+    private void showApplyStatus(InsuranceStatusEnum insuranceStatusEnum) {
+        switch (insuranceStatusEnum) {
+
+            case 审核中:// 审核中
+                int type = getIntent().getIntExtra("operateType", Constants.INSURANCE.INSURANCE_ACTIVATE_OBSERVE);
+                ivResult.setImageResource(Constants.INSURANCE.INSURANCE_ACTIVATE_ADD == type ? R.drawable.check : R.drawable.on_the_way);
+                llSubmit.setVisibility(View.GONE);
+                tvInsuranceImprove.setVisibility(View.VISIBLE);
+                tvResult.setText(insuranceStatusEnum.name());
+                tvContent.setText(getString(R.string.verify_insurance_desc));
+                break;
+
+            case 审核未通过:// 未审核
+                llSubmit.setVisibility(View.VISIBLE);
+                tvInsuranceImprove.setVisibility(View.GONE);
+                ivResult.setImageResource(R.drawable.error);
+                tvResult.setText(insuranceStatusEnum.name());
+                String statusDesc = loginInfo.getStatusDesc();
+                tvContent.setText(String.format(getString(R.string.verify_insurance_wrong_format), CommonUtils.getNonNull(statusDesc, getString(R.string.verify_insurance_wrong_default))));
+                break;
+        }
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_insurance_apply_status;
+    }
+
+    @Override
+    public void onBackPressed() {
+        setResult(protectionStatus);
+        finish();
+    }
+
+
+    @OnClick({R.id.ll_back, R.id.ll_submit, R.id.tv_insurance_improve})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ll_back:// 返回
+                onBackPressed();
+                break;
+            case R.id.ll_submit:// 重新激活
+                Intent intent = new Intent();
+                intent.setClass(this, InsuranceActivateActivity.class);
+                intent.putExtra("protectionStatus", protectionStatus);
+                intent.putExtra("operateType", Constants.INSURANCE.INSURANCE_ACTIVATE_EDIT);
+                startActivityForResult(intent, BuildConf.RequestResultCode.EXCLUSIVE_SERVICE_REQUEST);
+                break;
+
+            case R.id.tv_insurance_improve:
+                intent = new Intent(this, InsuranceClaimActivity.class);
+                intent.putExtra("protectionStatus", protectionStatus);
+                intent.putExtra("operateType", Constants.INSURANCE.INSURANCE_CLAIM_ADD);
+                startActivityForResult(intent, BuildConf.RequestResultCode.ADD_INSURANCE_CLAIM_REQUEST);
+                break;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (BuildConf.RequestResultCode.ADD_INSURANCE_CLAIM_REQUEST == requestCode || BuildConf.RequestResultCode.EXCLUSIVE_SERVICE_REQUEST == requestCode) {
+            setResult(resultCode);
+            finish();
+        }
+    }
+
+}

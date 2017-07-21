@@ -1,0 +1,18 @@
+package com.zenchn.electrombile.api;
+
+import com.zenchn.electrombile.base.BaseApi;
+
+/**
+ * 作    者：wangr on 2017/2/22 15:09
+ * 描    述：
+ * 修订记录：
+ */
+public class FeedbackApi extends BaseApi {
+
+    private FeedbackApi() {
+    }
+
+    public static FeedbackApi getInstance() {
+        return new FeedbackApi();
+    }
+}

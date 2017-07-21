@@ -1,0 +1,102 @@
+package com.zenchn.electrombile.adapter;
+
+import android.content.Context;
+import android.graphics.Paint;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.entity.InsuranceProductInfo;
+import com.zenchn.electrombile.widget.RecyclerView.listener.OnItemSegmentClickListener;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+/**
+ * 作    者：wangr on 2017/3/7 14:42
+ * 描    述：用于保险套餐展示的适配器
+ * 修订记录：
+ */
+public class InsuranceProductAdapter extends RecyclerView.Adapter<InsuranceProductAdapter.ViewHolder> {
+
+    private Context mContext;
+    private List<InsuranceProductInfo> mData;
+    private OnItemSegmentClickListener listener;
+
+    public InsuranceProductAdapter(Context context, List<InsuranceProductInfo> data) {
+        this.mContext = context;
+        this.mData = data;
+    }
+
+    public InsuranceProductAdapter(Context mContext, List<InsuranceProductInfo> mData, OnItemSegmentClickListener listener) {
+        this.mContext = mContext;
+        this.mData = mData;
+        this.listener = listener;
+    }
+
+    public void setListener(OnItemSegmentClickListener listener) {
+        this.listener = listener;
+    }
+
+    @Override
+    public InsuranceProductAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.recyclerview_item_insurance, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(ViewHolder holder, final int position) {
+        final InsuranceProductInfo insuranceProductInfo = mData.get(position);
+        if (insuranceProductInfo != null) {
+            holder.tvInsuranceTitle.setText(insuranceProductInfo.getName());
+            holder.tvInsuranceDesc.setText(insuranceProductInfo.getRemark());
+            holder.tvInsurancePrice.setText(insuranceProductInfo.getPrice());
+            holder.tvInsurancePriceOld.getPaint().setFlags(Paint.STRIKE_THRU_TEXT_FLAG | Paint.ANTI_ALIAS_FLAG); // 设置中划线并加清晰
+            holder.tvInsurancePriceOld.setText(insuranceProductInfo.getOldPrice());
+            if (listener != null) {
+                holder.llLeft.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onLeftClick(position, insuranceProductInfo);
+                    }
+                });
+                holder.llRight.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onRightClick(position, insuranceProductInfo);
+                    }
+                });
+            }
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData != null ? mData.size() : 0;
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+        @BindView(R.id.tv_insurance_title)
+        TextView tvInsuranceTitle;
+        @BindView(R.id.tv_insurance_desc)
+        TextView tvInsuranceDesc;
+        @BindView(R.id.ll_left)
+        LinearLayout llLeft;
+        @BindView(R.id.tv_insurance_price)
+        TextView tvInsurancePrice;
+        @BindView(R.id.tv_insurance_price_old)
+        TextView tvInsurancePriceOld;
+        @BindView(R.id.ll_right)
+        LinearLayout llRight;
+
+        ViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
+}

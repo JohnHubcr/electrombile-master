@@ -1,0 +1,134 @@
+package com.zenchn.electrombile.ui.activity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.entity.VehicleCheckForJKInfo;
+import com.zenchn.electrombile.entity.VehicleCheckForSTInfo;
+import com.zenchn.electrombile.presenter.VehicleCheckPresenter;
+import com.zenchn.electrombile.presenter.impl.VehicleCheckPresenterImpl;
+import com.zenchn.electrombile.ui.fragment.VehicleCheckJKFragment;
+import com.zenchn.electrombile.ui.fragment.VehicleCheckSTFragment;
+import com.zenchn.electrombile.ui.view.VehicleCheckView;
+import com.zenchn.electrombile.utils.EquModelUtils;
+import com.zenchn.electrombile.widget.CircleTextImageView;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 作    者：wangr on 2017/2/24 15:17
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleCheckActivity extends BaseActivity implements VehicleCheckView {
+
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.iv_head)
+    CircleTextImageView ivHead;
+    @BindView(R.id.tv_motor_grade)
+    TextView tvMotorGrade;
+    @BindView(R.id.tv_vehicle_status)
+    TextView tvVehicleStatus;
+    @BindView(R.id.tv_vehicle_suggest)
+    TextView tvVehicleSuggest;
+    @BindView(R.id.tv_vehicle_check_title)
+    TextView tvVehicleCheckTitle;
+
+    private Boolean checkStatus;
+    private boolean whetherEquModelForST;
+
+    private VehicleCheckPresenter presenter;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    public VehicleCheckActivity() {
+        presenter = new VehicleCheckPresenterImpl(this);
+    }
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        initData();
+    }
+
+    @Override
+    protected void initData() {
+        tvTitle.setText(getString(R.string.title_vehicle_check));
+        setCheckStatus(null);//设置状态为未体检
+        whetherEquModelForST = EquModelUtils.isEquModelForST(loginInfo.getEquModel());
+        initFragment(whetherEquModelForST);
+        initVehicleCheck();
+    }
+
+    /**
+     * 设置体检状态
+     *
+     * @param checkStatus
+     */
+    private void setCheckStatus(Boolean checkStatus) {
+        this.checkStatus = checkStatus;
+        tvVehicleStatus.setText(checkStatus == null ? getString(R.string.vehicle_check_pre) : (getString(checkStatus ? R.string.vehicle_check_ing : R.string.vehicle_check_after)));
+    }
+
+    /**
+     * 根据协议设置显示
+     *
+     * @param whetherEquModelForST
+     */
+    private void initFragment(boolean whetherEquModelForST) {
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, whetherEquModelForST ? new VehicleCheckSTFragment() : new VehicleCheckJKFragment())
+                .commit();
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_vehicle_check;
+    }
+
+    @Override
+    public boolean useUiHandler() {
+        return true;
+    }
+
+    private void initVehicleCheck() {
+        presenter.getVehicleStatus(loginInfo.getAccessToken(), loginInfo.getSerialNumber(), loginInfo.getEquModel());
+    }
+
+    @OnClick({R.id.ll_back, R.id.ll_vehicle_check})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ll_back:
+                onBackPressed();
+                break;
+            case R.id.ll_vehicle_check:
+                if (checkStatus == null || !checkStatus) {
+                    setCheckStatus(true);//设置状态为体检中
+                    initVehicleCheck();//先从本地缓存中获取
+                } else {
+                    showResMessage(R.string.vehicle_checking);
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onGetVehicleCheckSuccess(VehicleCheckForSTInfo vehicleCheckForSTInfo) {
+
+    }
+
+    @Override
+    public void onGetVehicleCheckSuccess(VehicleCheckForJKInfo vehicleCheckForJKInfo) {
+
+    }
+}

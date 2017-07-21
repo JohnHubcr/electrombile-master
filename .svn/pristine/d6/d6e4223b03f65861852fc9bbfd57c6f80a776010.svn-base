@@ -1,0 +1,59 @@
+package com.zenchn.electrombile.widget.PickerView;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.widget.PickerView.view.BasePickerView;
+import com.zenchn.electrombile.widget.PickerView.view.WheelArea;
+
+/**
+ * 作    者：wangr on 2017/3/10 15:48
+ * 描    述：
+ * 修订记录：
+ */
+public class AreaPickerView extends BasePickerView implements View.OnClickListener {
+
+    private WheelArea wheelArea;
+    private TextView tvTitle;
+
+    public AreaPickerView(Context context) {
+
+        super(context);
+
+        LayoutInflater.from(context).inflate(R.layout.pickerview_time, contentContainer);
+
+        // -----确定和取消按钮
+        findViewById(R.id.btnSubmit).setOnClickListener(this);
+        findViewById(R.id.btnCancel).setOnClickListener(this);
+
+        // 顶部标题
+        tvTitle = (TextView) findViewById(R.id.tvTitle);
+
+        // ----省市区转轮
+        View areaPickerView = findViewById(R.layout.pickerview_area);
+        wheelArea = new WheelArea(areaPickerView);
+
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+
+            case R.id.btnSubmit:
+
+                dismiss();
+                break;
+
+            case R.id.btnCancel:
+                dismiss();
+                break;
+        }
+    }
+
+    public void setTitle(String title) {
+        tvTitle.setText(title);
+    }
+}

@@ -1,0 +1,300 @@
+package com.zenchn.electrombile.api;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zenchn.electrombile.BuildConf;
+import com.zenchn.electrombile.api.callback.ApiCallback;
+import com.zenchn.electrombile.api.callback.SetCommonCallback;
+import com.zenchn.electrombile.api.callback.VehicleCheckCallback;
+import com.zenchn.electrombile.base.BaseApi;
+import com.zenchn.electrombile.entity.VehicleCheckRawForJKInfo;
+import com.zenchn.electrombile.entity.VehicleCheckRawForSTInfo;
+import com.zenchn.electrombile.entity.VehicleRecordInfo;
+import com.zenchn.electrombile.kit.LogKit;
+import com.zenchn.electrombile.kit.RetrofitKit;
+import com.zenchn.electrombile.utils.EquModelUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * 作    者：wangr on 2017/2/28 15:32
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleInfoApi extends BaseApi {
+
+    private VehicleInfoApi() {
+    }
+
+    public static VehicleInfoApi getInstance() {
+        return new VehicleInfoApi();
+    }
+
+    /**
+     * 获取车辆列表
+     *
+     * @param accessToken
+     * @param callback
+     */
+    public void getVehicleList(String accessToken, final ApiCallback<List<VehicleRecordInfo>> callback) {
+
+        mApiStore
+                .getVehicleList(accessToken)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+
+                            if (response.code() == 200) {
+
+                                JSONObject jsonResult = JSON.parseObject(response.body());
+
+
+                                JSONArray list = jsonResult.getJSONObject("data").getJSONArray("list");
+                                List<VehicleRecordInfo> mData = null;
+
+                                if (list != null && !list.isEmpty()) {
+                                    mData = new ArrayList<>();
+                                    VehicleRecordInfo vehicleRecordInfo = null;
+                                    int size = list.size();
+
+                                    for (int i = 0; i < size; i++) {
+                                        JSONObject obj = list.getJSONObject(i);
+                                        vehicleRecordInfo = new VehicleRecordInfo();
+                                        vehicleRecordInfo.setSerialNumber(obj.getString("serialNumber"));
+                                        vehicleRecordInfo.setVehicleAlias(obj.getString("vehicleName"));
+                                        vehicleRecordInfo.setWhetherCommon(obj.getIntValue("whetherCommon"));
+                                        vehicleRecordInfo.setUserLevel(obj.getIntValue("userLevel"));
+                                        vehicleRecordInfo.setId(obj.getString("id"));
+                                        vehicleRecordInfo.setUseId(obj.getString("userId"));
+                                        vehicleRecordInfo.setEquipmentId(obj.getString("equipmentId"));
+                                        mData.add(vehicleRecordInfo);
+                                    }
+                                }
+
+                                LogKit.success("车辆列表信息获取成功", "定位信息：\n" + mData != null ? mData.toString() : "列表为空！");
+                                callback.onSuccess(mData);
+
+                            } else if (response.code() == 401) {
+
+                                callback.onGrantRefuse();
+                                LogKit.success("车辆列表信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                            } else {
+                                JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                LogKit.success("车辆列表信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                callback.onFailure();
+                            }
+
+                        } catch (Exception e) {
+                            callback.onFailure();
+                            LogKit.exception("车辆列表信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        callback.onFailure();
+                        LogKit.exception("车辆列表信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                    }
+                });
+    }
+
+    /**
+     * 设置常用车辆
+     *
+     * @param accessToken
+     * @param id
+     * @param oldId
+     * @param callback
+     */
+    public void setCommonVehicle(String accessToken, String id, String oldId, SetCommonCallback callback) {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("id", id);
+        jsonObject.put("oldId", oldId);
+        setCommonVehicle(accessToken, RetrofitKit.createRequestBody(jsonObject), callback);
+    }
+
+    /**
+     * 设置常用车辆
+     *
+     * @param accessToken
+     * @param body
+     * @param callback
+     */
+    private void setCommonVehicle(String accessToken, RequestBody body, final SetCommonCallback callback) {
+
+        mApiStore
+                .setCommonVehicle(accessToken, body)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+
+                            if (response.code() == 200) {
+
+                                int statusCode = JSON.parseObject(response.body()).getIntValue("statusCode");
+
+                                LogKit.success("常用车辆设置成功", "设置成功！");
+                                callback.onSetCommonResponse(statusCode == BuildConf.ApiStatusCode.SUCCESS);
+
+                            } else if (response.code() == 401) {
+
+                                callback.onGrantRefuse();
+                                LogKit.success("常用车辆设置失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                            } else {
+                                JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                LogKit.success("常用车辆设置失败", "失败原因：\n" + errorResult.getString("error"));
+                                callback.onSetCommonResponse(null);
+                            }
+
+                        } catch (Exception e) {
+                            callback.onSetCommonResponse(null);
+                            LogKit.exception("常用车辆设置失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        callback.onSetCommonResponse(null);
+                        LogKit.exception("常用车辆设置失败", "访问失败, 异常信息：\n" + t.toString());
+                    }
+                });
+    }
+
+    /**
+     * 获取车辆档案信息
+     *
+     * @param accessToken
+     * @param serialNumber
+     * @param callback
+     */
+    public void getVehicleRecord(String accessToken, String serialNumber, final ApiCallback<VehicleRecordInfo> callback) {
+
+        mApiStore
+                .getVehicleRecord(accessToken, serialNumber)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+
+                            if (response.code() == 200) {
+
+                                JSONObject data = JSON.parseObject(response.body()).getJSONObject("data");
+
+                                VehicleRecordInfo vehicleRecordInfo = new VehicleRecordInfo();
+                                vehicleRecordInfo.setVehicleBrand(data.getString("brand"));
+                                vehicleRecordInfo.setVehicleModel(data.getString("specification"));
+                                vehicleRecordInfo.setMotorNo(data.getString("motorNo"));
+                                vehicleRecordInfo.setMachineNumber(data.getString("number"));
+                                vehicleRecordInfo.setPayTime(data.getString("payTime"));
+
+                                LogKit.success("车辆档案信息获取成功", "定位信息：\n" + vehicleRecordInfo.toString());
+                                callback.onSuccess(vehicleRecordInfo);
+
+                            } else if (response.code() == 401) {
+
+                                callback.onGrantRefuse();
+                                LogKit.success("车辆档案信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                            } else {
+                                JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                LogKit.success("车辆档案信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                callback.onFailure();
+                            }
+
+                        } catch (Exception e) {
+                            callback.onFailure();
+                            LogKit.exception("车辆档案信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        callback.onFailure();
+                        LogKit.exception("车辆档案信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                    }
+                });
+    }
+
+    /**
+     * 获取车辆自检信息
+     *
+     * @param accessToken
+     * @param serialNumber
+     * @param equModel
+     */
+    public void getVehicleStatus(String accessToken, String serialNumber, final int equModel, final VehicleCheckCallback callback) {
+
+        mApiStore
+                .getVehicleStatus(accessToken, serialNumber, String.valueOf(equModel))
+                .enqueue(new Callback<String>() {
+                             @Override
+                             public void onResponse(Call<String> call, Response<String> response) {
+                                 try {
+
+                                     if (response.code() == 200) {
+
+                                         JSONObject data = JSON.parseObject(response.body()).getJSONObject("data");
+
+                                         if (EquModelUtils.EQU_MODEL_ST == equModel) {
+
+                                             VehicleCheckRawForSTInfo vehicleCheckRawForSTInfo = new VehicleCheckRawForSTInfo();
+                                             vehicleCheckRawForSTInfo.setBmsTrouble(data.getString("bmsStatus"));
+                                             vehicleCheckRawForSTInfo.setVehicleConditionStatus(data.getString("vehicleInfo"));
+
+
+                                             LogKit.success("车辆自检信息(神腾)获取成功", vehicleCheckRawForSTInfo.toString());
+                                             callback.onGetVehicleCheckSuccess(vehicleCheckRawForSTInfo);
+
+                                         } else {
+                                             VehicleCheckRawForJKInfo vehicleCheckRawForJKInfo = new VehicleCheckRawForJKInfo();
+
+                                             vehicleCheckRawForJKInfo.setBmsTrouble(data.getString("bmsTrouble"));
+                                             vehicleCheckRawForJKInfo.setChargerTrouble(data.getString("chargerTrouble"));
+                                             vehicleCheckRawForJKInfo.setControlTroubleStatus1(data.getString("controlTroubleStatus1"));
+                                             vehicleCheckRawForJKInfo.setControlTroubleStatus2(data.getString("controlTroubleStatus2"));
+                                             vehicleCheckRawForJKInfo.setEcuOnlineCheck(data.getString("ecuOnlineCheck"));
+                                             vehicleCheckRawForJKInfo.setEcuTrouble(data.getString("ecuTrouble"));
+                                             vehicleCheckRawForJKInfo.setGyroscopeStatus(data.getString("gyroscopeStatus"));
+                                             vehicleCheckRawForJKInfo.setMeterTroubleStatus(data.getString("meterTroubleStatus"));
+
+                                             LogKit.success("车辆自检信息(金开)获取成功", "定位信息：\n" + vehicleCheckRawForJKInfo.toString());
+                                             callback.onGetVehicleCheckSuccess(vehicleCheckRawForJKInfo);
+                                         }
+
+                                     } else if (response.code() == 401) {
+
+                                         callback.onGrantRefuse();
+                                         LogKit.success("车辆自检信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                                     } else {
+                                         JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                         LogKit.success("车辆自检信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                         callback.onGetVehicleCheckResponseError(errorResult.getString("error"));
+                                     }
+
+                                 } catch (Exception e) {
+                                     callback.onGetVehicleCheckFailure();
+                                     LogKit.exception("车辆自检信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                                 }
+                             }
+
+                             @Override
+                             public void onFailure(Call<String> call, Throwable t) {
+                                 callback.onGetVehicleCheckFailure();
+                                 LogKit.exception("车辆自检信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                             }
+                         }
+
+                );
+    }
+}

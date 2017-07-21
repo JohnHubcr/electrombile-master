@@ -1,0 +1,77 @@
+package com.zenchn.electrombile.presenter.impl;
+
+import com.zenchn.electrombile.api.VehicleInfoApi;
+import com.zenchn.electrombile.api.callback.VehicleCheckCallback;
+import com.zenchn.electrombile.entity.VehicleCheckForJKInfo;
+import com.zenchn.electrombile.entity.VehicleCheckForSTInfo;
+import com.zenchn.electrombile.presenter.VehicleCheckPresenter;
+import com.zenchn.electrombile.ui.view.VehicleCheckView;
+
+/**
+ * 作    者：wangr on 2017/3/13 13:53
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleCheckPresenterImpl implements VehicleCheckPresenter, VehicleCheckCallback {
+
+    private VehicleCheckView vehicleCheckView;
+
+    public VehicleCheckPresenterImpl(VehicleCheckView vehicleCheckView) {
+        this.vehicleCheckView = vehicleCheckView;
+    }
+
+    @Override
+    public void onDestroy() {
+        vehicleCheckView = null;
+    }
+
+    @Override
+    public void getVehicleStatus(String accessToken, String serialNumber, int equModel) {
+        if (vehicleCheckView != null) {
+            vehicleCheckView.showProgress();
+            VehicleInfoApi
+                    .getInstance()
+                    .getVehicleStatus(accessToken, serialNumber, equModel, this);
+        }
+    }
+
+    @Override
+    public void onGetVehicleCheckSuccess(VehicleCheckForSTInfo vehicleCheckForSTInfo) {
+        if (vehicleCheckView != null) {
+            vehicleCheckView.hideProgress();
+            vehicleCheckView.onGetVehicleCheckSuccess(vehicleCheckForSTInfo);
+        }
+    }
+
+    @Override
+    public void onGetVehicleCheckSuccess(VehicleCheckForJKInfo vehicleCheckForJKInfo) {
+        if (vehicleCheckView != null) {
+            vehicleCheckView.hideProgress();
+            vehicleCheckView.onGetVehicleCheckSuccess(vehicleCheckForJKInfo);
+        }
+    }
+
+    @Override
+    public void onGetVehicleCheckFailure() {
+        if (vehicleCheckView != null) {
+            vehicleCheckView.hideProgress();
+            vehicleCheckView.onFailure();
+        }
+    }
+
+    @Override
+    public void onGetVehicleCheckResponseError(String error_msg) {
+        if (vehicleCheckView != null) {
+            vehicleCheckView.hideProgress();
+            vehicleCheckView.onResponseError(error_msg);
+        }
+    }
+
+    @Override
+    public void onGrantRefuse() {
+        if (vehicleCheckView != null) {
+            vehicleCheckView.hideProgress();
+            vehicleCheckView.onGrantRefuse();
+        }
+    }
+}

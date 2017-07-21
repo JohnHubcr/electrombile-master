@@ -1,0 +1,123 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <include
+            android:id="@+id/in_head"
+            layout="@layout/include_top_head_cancel"/>
+
+        <TextView
+            android:id="@+id/tv_commit"
+            style="@style/HeadTitleRightTextViewStyle"
+            android:layout_alignParentRight="true"
+            android:text="提交"/>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="@dimen/common_margin"
+        android:paddingRight="0dp">
+
+        <TextView
+            style="@style/BaseTextViewStyle"
+            android:ems="4"
+            android:text="登录密码"
+            android:textColor="@color/white"/>
+
+        <EditText
+            android:id="@+id/et_password"
+            style="@style/CommonButtonPswEditTextViewStyle"
+            android:hint="请输入密码"
+            android:paddingLeft="@dimen/small_padding"></EditText>
+
+        <ImageView
+            android:id="@+id/iv_psw_show"
+            style="@style/BaseEditTextPswShowOrHideStyle"
+            android:paddingRight="@dimen/common_padding"
+            android:visibility="invisible"/>
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="@dimen/common_margin"
+        android:paddingRight="0dp">
+
+        <TextView
+            style="@style/BaseTextViewStyle"
+            android:ems="4"
+            android:text="手机号"
+            android:textColor="@color/white"/>
+
+        <EditText
+            android:id="@+id/et_new_mobile_phone"
+            style="@style/CommonButtonEditTextViewStyle"
+            android:hint="请输入新手机号"
+            android:inputType="phone"
+            android:paddingLeft="@dimen/small_padding"></EditText>
+
+        <ImageView
+            android:id="@+id/iv_new_clear"
+            style="@style/BaseEditTextClearStyle"
+            android:paddingRight="@dimen/common_padding"
+            android:visibility="invisible"/>
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="@dimen/small_margin"
+        android:paddingRight="0dp">
+
+        <TextView
+            style="@style/BaseTextViewStyle"
+            android:ems="4"
+            android:text="验证码"
+            android:textColor="@color/white"/>
+
+        <EditText
+            android:id="@+id/et_identifying_code"
+            style="@style/CommonButtonEditTextViewStyle"
+            android:ems="6"
+            android:hint="请输入验证码"
+            android:inputType="number"
+            android:maxEms="6"
+            android:paddingLeft="@dimen/small_padding"
+            android:singleLine="true"
+            android:textColor="@color/base_text_color_light"
+            android:textStyle="bold"></EditText>
+
+        <LinearLayout
+            android:id="@+id/ll_send_identifying_code"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="8dp"
+            android:layout_marginRight="@dimen/little_margin"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/btn_shape_shadow_small"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/tv_send_identifying_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="6"
+                android:gravity="center"
+                android:text="发送验证码"
+                android:textColor="@color/white"
+                android:textSize="12sp"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        style="@style/BaseTextViewDescStyle"
+        android:layout_marginLeft="@dimen/common_margin"
+        android:layout_marginTop="@dimen/little_margin"
+        android:text="@string/account_desc"/>
+
+</LinearLayout>

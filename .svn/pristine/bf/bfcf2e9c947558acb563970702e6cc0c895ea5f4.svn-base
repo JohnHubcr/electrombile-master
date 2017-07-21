@@ -1,0 +1,108 @@
+<LinearLayout
+    android:id="@+id/ll_alarm_show"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center"
+    android:background="#86222222"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:id="@+id/ll_alarm"
+        android:layout_width="269dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/little_margin"
+        android:background="@drawable/alarm_show_shape"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_marginBottom="30dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="27dp"
+                android:src="@drawable/alarm"/>
+
+            <TextView
+                android:id="@+id/tv_alarm_desc"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:text="警报！车辆主电源断电报警！"
+                android:textColor="@color/alarm_info_color"/>
+
+            <TextView
+                android:id="@+id/tv_alarm_time"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/little_margin"
+                android:text="2016-11-17 10:59:23"
+                android:textColor="@color/alarm_info_color"
+                android:visibility="gone"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/little_margin"
+                android:text="如非本人操作，请及时查看"
+                android:textColor="@color/alarm_info_color"/>
+        </LinearLayout>
+
+        <include
+            layout="@layout/include_separate_tint_view"></include>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="45dp">
+
+            <LinearLayout
+                android:id="@+id/ll_ignore"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_negativeButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="忽略"
+                    android:textColor="#7D7D7D"
+                    android:textSize="16sp"/>
+
+            </LinearLayout>
+
+            <View
+                android:id="@+id/separate"
+                android:layout_width="1px"
+                android:layout_height="match_parent"
+                android:background="#dfdfdf"/>
+
+            <LinearLayout
+                android:id="@+id/ll_follow"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/tv_positiveButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="立即查看"
+                    android:textColor="@color/ios_text_color_blue"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

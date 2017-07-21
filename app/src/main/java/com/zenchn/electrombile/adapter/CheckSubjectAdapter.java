@@ -1,0 +1,121 @@
+package com.zenchn.electrombile.adapter;
+
+import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.adapter.bean.CheckSubjectInfo;
+import com.zenchn.electrombile.widget.AnimationFactory;
+import com.zenchn.electrombile.widget.RecyclerView.wrapper.IScanWrapperAdapter;
+import com.zenchn.electrombile.widget.RecyclerView.wrapper.ScanWrapperAdapter;
+
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+/**
+ * 作    者：wangr on 2017/3/13 13:36
+ * 描    述：
+ * 修订记录：
+ */
+
+public class CheckSubjectAdapter extends RecyclerView.Adapter<CheckSubjectAdapter.ViewHolder> implements IScanWrapperAdapter<CheckSubjectAdapter.ViewHolder> {
+
+    private List<CheckSubjectInfo> mData;
+    private Context mContext;
+
+    public CheckSubjectAdapter(Context context, List<CheckSubjectInfo> data) {
+        this.mContext = context;
+        this.mData = data;
+    }
+
+    @Override
+    public CheckSubjectAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new ViewHolder(LayoutInflater.from(mContext).inflate(R.layout.recyclerview_item_check_subject, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(CheckSubjectAdapter.ViewHolder holder, int position) {
+        CheckSubjectInfo checkSubjectInfo = mData.get(position);
+        if (checkSubjectInfo != null) {
+
+            holder.tvCheckSubjectTitle.setText(checkSubjectInfo.getTitle());
+            holder.ivCheckSubjectIcon.setImageResource(checkSubjectInfo.getIconId());
+            ImageView ivCheckSubjectResult = holder.ivCheckSubjectResult;
+
+            Boolean hasTrouble = checkSubjectInfo.getHasTrouble();
+            if (null == hasTrouble) {
+                ivCheckSubjectResult.setVisibility(View.INVISIBLE);
+            } else {
+                ivCheckSubjectResult.setVisibility(View.VISIBLE);
+                ivCheckSubjectResult.setImageResource(hasTrouble ? R.drawable.check_error : R.drawable.check_ok);
+            }
+        }
+    }
+
+    @Override
+    public void onBindViewHolderByItemCircleScan(ViewHolder holder, int position, final ScanWrapperAdapter.OnScanListener listener) {
+        CheckSubjectInfo checkSubjectInfo = mData.get(position);
+        if (checkSubjectInfo != null) {
+
+            holder.tvCheckSubjectTitle.setText(checkSubjectInfo.getTitle());
+            holder.ivCheckSubjectIcon.setImageResource(checkSubjectInfo.getIconId());
+            final Boolean hasTrouble = checkSubjectInfo.getHasTrouble();
+
+            final ImageView ivCheckSubjectResult = holder.ivCheckSubjectResult;
+            final ImageView ivCheckSubjectCircle = holder.ivCheckSubjectCircle;
+
+            AnimationFactory.showCircleView(ivCheckSubjectCircle, 1200, new AnimationFactory.onOnAnimationEndListener() {
+
+                @Override
+                public void onOnAnimationEnd() {
+                    if (listener != null)
+                        listener.onScanEnd();
+                    ivCheckSubjectCircle.setVisibility(View.INVISIBLE);
+                    ivCheckSubjectResult.setVisibility(View.VISIBLE);
+                    ivCheckSubjectResult.setImageResource(hasTrouble ? R.drawable.check_error : R.drawable.check_ok);
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onBindViewHolderByItemHide(ViewHolder holder, int position) {
+        CheckSubjectInfo checkSubjectInfo = mData.get(position);
+
+        if (checkSubjectInfo != null) {
+
+            holder.tvCheckSubjectTitle.setText(checkSubjectInfo.getTitle());
+            holder.ivCheckSubjectIcon.setImageResource(checkSubjectInfo.getIconId());
+            holder.ivCheckSubjectResult.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mData != null ? mData.size() : 0;
+    }
+
+    static class ViewHolder extends RecyclerView.ViewHolder {
+
+        @BindView(R.id.iv_check_subject_circle)
+        ImageView ivCheckSubjectCircle;
+        @BindView(R.id.iv_check_subject_icon)
+        ImageView ivCheckSubjectIcon;
+        @BindView(R.id.tv_check_subject_title)
+        TextView tvCheckSubjectTitle;
+        @BindView(R.id.iv_check_subject_result)
+        ImageView ivCheckSubjectResult;
+
+        ViewHolder(View view) {
+            super(view);
+            ButterKnife.bind(this, view);
+        }
+    }
+}

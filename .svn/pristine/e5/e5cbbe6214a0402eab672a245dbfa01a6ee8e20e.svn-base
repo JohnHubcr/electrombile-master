@@ -1,0 +1,227 @@
+package com.zenchn.electrombile.entity;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+/**
+ * 作    者：wangr on 2017/3/13 14:03
+ * 描    述：车辆定位信息描述类
+ * 修订记录：
+ */
+public class VehicleLocationInfo implements Parcelable {
+
+    private String serialNumber;// 车辆唯一编号
+    private double rawLatitude;// GPS纬度
+    private double rawLongitude;// GPS经度
+    private double bdLatitude;// 纬度(百度)
+    private double bdLongitude;// 经度(百度)
+    private double gdLatitude;// 纬度(高德)
+    private double gdLongitude;// 经度(高德)
+
+    private String speed;// 速度
+    private String mile;// 里程 单位:千米
+    private long utcTime;// 采集时间毫秒数
+    private String power;// 电量
+    private int onlineStatus;// 在线状态
+    private int powerStatus;// 充电状态
+    private int pStatus;// 设防状态
+    private int acc;// 开关状态
+
+    public VehicleLocationInfo() {
+    }
+
+    public String getSerialNumber() {
+        return serialNumber;
+    }
+
+    public void setSerialNumber(String serialNumber) {
+        this.serialNumber = serialNumber;
+    }
+
+    public double getRawLatitude() {
+        return rawLatitude;
+    }
+
+    public void setRawLatitude(double rawLatitude) {
+        this.rawLatitude = rawLatitude;
+    }
+
+    public double getRawLongitude() {
+        return rawLongitude;
+    }
+
+    public void setRawLongitude(double rawLongitude) {
+        this.rawLongitude = rawLongitude;
+    }
+
+    public double getBdLatitude() {
+        return bdLatitude;
+    }
+
+    public void setBdLatitude(double bdLatitude) {
+        this.bdLatitude = bdLatitude;
+    }
+
+    public double getBdLongitude() {
+        return bdLongitude;
+    }
+
+    public void setBdLongitude(double bdLongitude) {
+        this.bdLongitude = bdLongitude;
+    }
+
+    public double getGdLatitude() {
+        return gdLatitude;
+    }
+
+    public void setGdLatitude(double gdLatitude) {
+        this.gdLatitude = gdLatitude;
+    }
+
+    public double getGdLongitude() {
+        return gdLongitude;
+    }
+
+    public void setGdLongitude(double gdLongitude) {
+        this.gdLongitude = gdLongitude;
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
+    }
+
+    public String getMile() {
+        return mile;
+    }
+
+    public void setMile(String mile) {
+        this.mile = mile;
+    }
+
+    public long getUtcTime() {
+        return utcTime;
+    }
+
+    public void setUtcTime(long utcTime) {
+        this.utcTime = utcTime;
+    }
+
+    public String getPower() {
+        return power;
+    }
+
+    public void setPower(String power) {
+        this.power = power;
+    }
+
+    public int getOnlineStatus() {
+        return onlineStatus;
+    }
+
+    public void setOnlineStatus(int onlineStatus) {
+        this.onlineStatus = onlineStatus;
+    }
+
+    public int getPowerStatus() {
+        return powerStatus;
+    }
+
+    public void setPowerStatus(int powerStatus) {
+        this.powerStatus = powerStatus;
+    }
+
+    public int getPStatus() {
+        return pStatus;
+    }
+
+    public void setPStatus(int pStatus) {
+        this.pStatus = pStatus;
+    }
+
+    public int getAcc() {
+        return acc;
+    }
+
+    public void setAcc(int acc) {
+        this.acc = acc;
+    }
+
+    @Override
+    public String toString() {
+        return "MotorLocationInfo{" +
+                "serialNumber='" + serialNumber + '\'' +
+                ", rawLatitude=" + rawLatitude +
+                ", rawLongitude=" + rawLongitude +
+                ", bdLatitude=" + bdLatitude +
+                ", bdLongitude=" + bdLongitude +
+                ", gdLatitude=" + gdLatitude +
+                ", gdLongitude=" + gdLongitude +
+                ", speed='" + speed + '\'' +
+                ", mile='" + mile + '\'' +
+                ", utcTime=" + utcTime +
+                ", power='" + power + '\'' +
+                ", onlineStatus=" + onlineStatus +
+                ", powerStatus=" + powerStatus +
+                ", pStatus=" + pStatus +
+                ", acc=" + acc +
+                '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.serialNumber);
+        dest.writeDouble(this.rawLatitude);
+        dest.writeDouble(this.rawLongitude);
+        dest.writeDouble(this.bdLatitude);
+        dest.writeDouble(this.bdLongitude);
+        dest.writeDouble(this.gdLatitude);
+        dest.writeDouble(this.gdLongitude);
+        dest.writeString(this.speed);
+        dest.writeString(this.mile);
+        dest.writeLong(this.utcTime);
+        dest.writeString(this.power);
+        dest.writeInt(this.onlineStatus);
+        dest.writeInt(this.powerStatus);
+        dest.writeInt(this.pStatus);
+        dest.writeInt(this.acc);
+    }
+
+    protected VehicleLocationInfo(Parcel in) {
+        this.serialNumber = in.readString();
+        this.rawLatitude = in.readDouble();
+        this.rawLongitude = in.readDouble();
+        this.bdLatitude = in.readDouble();
+        this.bdLongitude = in.readDouble();
+        this.gdLatitude = in.readDouble();
+        this.gdLongitude = in.readDouble();
+        this.speed = in.readString();
+        this.mile = in.readString();
+        this.utcTime = in.readLong();
+        this.power = in.readString();
+        this.onlineStatus = in.readInt();
+        this.powerStatus = in.readInt();
+        this.pStatus = in.readInt();
+        this.acc = in.readInt();
+    }
+
+    public static final Creator<VehicleLocationInfo> CREATOR = new Creator<VehicleLocationInfo>() {
+        @Override
+        public VehicleLocationInfo createFromParcel(Parcel source) {
+            return new VehicleLocationInfo(source);
+        }
+
+        @Override
+        public VehicleLocationInfo[] newArray(int size) {
+            return new VehicleLocationInfo[size];
+        }
+    };
+}

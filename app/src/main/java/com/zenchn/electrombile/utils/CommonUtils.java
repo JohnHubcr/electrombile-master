@@ -1,0 +1,353 @@
+package com.zenchn.electrombile.utils;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.telephony.TelephonyManager;
+import android.text.TextUtils;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
+
+import com.tencent.android.tpush.XGPushConfig;
+import com.zenchn.electrombile.BuildConf;
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.entity.ClientInfo;
+import com.zenchn.electrombile.entity.UserInfo;
+import com.zenchn.electrombile.kit.LogKit;
+
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * 通用工具类
+ */
+public class CommonUtils {
+
+    private CommonUtils() {
+    }
+
+    private static long lastClickTime;
+    private static ExecutorService executorService = Executors.newCachedThreadPool();
+
+    /**
+     * 防止控件被重复点击相隔800ms
+     *
+     * @return
+     */
+    public static boolean isFastDoubleClick() {
+        long time = System.currentTimeMillis();
+        long timeD = time - lastClickTime;
+        if (0 < timeD && timeD < 800) {
+            return true;
+        }
+        lastClickTime = time;
+        return false;
+    }
+
+    /**
+     * 在子线程中执行
+     *
+     * @param task
+     */
+    public static void runInThread(Runnable task) {
+        executorService.execute(task);
+    }
+
+    /**
+     * 在主线程中执行
+     *
+     * @param task
+     */
+    public static void runOnUIThread(Runnable task) {
+        new Handler(Looper.getMainLooper()).post(task);
+    }
+
+    /**
+     * 启动一个Activity
+     *
+     * @param ctx
+     * @param clazz
+     */
+    @SuppressWarnings("rawtypes")
+    public static void startActivity(Object ctx, Class clazz) {
+        if (ctx instanceof Context) {
+            Context mContext = (Context) ctx;
+            mContext.startActivity(new Intent(mContext, clazz));
+        }
+    }
+
+    /**
+     * 判断一个字符串有内容(非空且非空字符串)
+     *
+     * @param character
+     * @return
+     */
+    public static boolean isEmpty(String character) {
+        return null == character || TextUtils.isEmpty(character.trim());
+    }
+
+    /**
+     * 判断一个集合是否为空
+     *
+     * @param collection
+     * @return
+     */
+    public static boolean isEmpty(Collection collection) {
+        return null == collection || collection.isEmpty();
+    }
+
+    /**
+     * 判断一个集合是否为空
+     *
+     * @param map
+     * @return
+     */
+    public static boolean isEmpty(Map map) {
+        return null == map || map.isEmpty();
+    }
+
+    /**
+     * 判断一个字符串有内容(非空且非空字符串)
+     *
+     * @param character
+     * @return
+     */
+    public static boolean isNonNull(String character) {
+        return null != character && !TextUtils.isEmpty(character.trim());
+    }
+
+
+    /**
+     * 判断一个集合有内容(非空)
+     *
+     * @param collection
+     * @return
+     */
+    public static boolean isNonNull(Collection collection) {
+        return null != collection && collection.isEmpty();
+    }
+
+    /**
+     * 判断一个集合有内容(非空)
+     *
+     * @param map
+     * @return
+     */
+    public static boolean isNonNull(Map map) {
+        return null != map && !map.isEmpty();
+    }
+
+    /**
+     * 对字符串进行非空处理
+     *
+     * @param character
+     * @return
+     */
+    public static String getNonNull(String character) {
+        return isNonNull(character) ? character : "";
+    }
+
+    /**
+     * 对字符串进行非空处理
+     *
+     * @param character
+     * @param expectCharacter 为空时候赋予的默认值
+     * @return
+     */
+    public static String getNonNull(String character, String expectCharacter) {
+        return isNonNull(character) ? character : (isNonNull(expectCharacter) ? expectCharacter : "");
+    }
+
+
+    /**
+     * 判断信鸽token是否有效(非空且非空字符串且不为0)
+     *
+     * @param token
+     * @return
+     */
+    public static boolean isValidXGToken(String token) {
+        return null != token && (!TextUtils.isEmpty(token.trim()) && (!"0".equals(token)));
+    }
+
+    /**
+     * 判断信鸽token是否有效(非空且非空字符串且不为0)
+     *
+     * @param mContext
+     * @return
+     */
+    public static boolean isValidXGToken(Context mContext) {
+        return isValidXGToken(XGPushConfig.getToken(mContext.getApplicationContext()));
+    }
+
+
+    /**
+     * 用户登陆令牌授权时获取用户信息(获取令牌)
+     *
+     * @param mContext
+     * @return
+     */
+    public static UserInfo getBaseUserInfo(Context mContext) {
+        mContext = mContext.getApplicationContext();
+        TelephonyManager TelephonyMgr = (TelephonyManager) mContext.getSystemService(android.content.Context.TELEPHONY_SERVICE);
+        String clientId = BuildConf.API_GRANT.CLIENT_ID;
+        String clientSecret = BuildConf.API_GRANT.CLIENT_SECRET;
+        String grantType = BuildConf.API_GRANT.GRANT_TYPE;
+        String deviceId = TelephonyMgr.getDeviceId();// 返回手机唯一标示
+        String deviceName = Build.MODEL;//返回手机型号
+        String deviceType = BuildConf.API_GRANT.CLIENT_TYPE;//系统类型
+        return new UserInfo(clientId, clientSecret, grantType, deviceId, deviceName, deviceType);
+    }
+
+    /**
+     * 用户登陆令牌授权时获取用户信息(刷新令牌令牌)
+     *
+     * @return
+     */
+    public static UserInfo getBaseUserInfo() {
+        String clientId = BuildConf.API_GRANT.CLIENT_ID;
+        String clientSecret = BuildConf.API_GRANT.CLIENT_SECRET;
+        String grantType = BuildConf.API_GRANT.REFRESH_TOKEN;
+        return new UserInfo(clientId, clientSecret, grantType);
+    }
+
+    /**
+     * 用户登陆时获取用户信息(手机本地信息)
+     *
+     * @param mContext
+     * @return
+     */
+    public static ClientInfo getBaseClientInfo(Context mContext) {
+        TelephonyManager TelephonyMgr = (TelephonyManager) mContext.getSystemService(android.content.Context.TELEPHONY_SERVICE);
+        String vehicleIMEI = TelephonyMgr.getDeviceId();// 返回手机唯一标示
+        String appSpecification = Build.MODEL;
+        String appVersion = mContext.getResources().getString(R.string.app_version);
+        String token = XGPushConfig.getToken(mContext);
+        String systemType = "Android";
+        return new ClientInfo(systemType, appSpecification, appVersion, vehicleIMEI, token);
+    }
+
+    /**
+     * ViewGroup设置不可点击
+     *
+     * @param view
+     * @param enabled
+     */
+    public static void setViewGroupEnabled(View view, boolean enabled) {
+        if (null == view) {
+            return;
+        }
+        if (view instanceof ViewGroup) {
+            ViewGroup viewGroup = (ViewGroup) view;
+            LinkedList<ViewGroup> queue = new LinkedList<>();
+            queue.add(viewGroup);
+            // 遍历viewGroup
+            while (!queue.isEmpty()) {
+                ViewGroup current = queue.removeFirst();
+                current.setEnabled(enabled);
+                for (int i = 0; i < current.getChildCount(); i++) {
+                    if (current.getChildAt(i) instanceof ViewGroup) {
+                        queue.addLast((ViewGroup) current.getChildAt(i));
+                    } else {
+                        current.getChildAt(i).setEnabled(enabled);
+                    }
+                }
+            }
+        } else {
+            view.setEnabled(enabled);
+        }
+    }
+
+    /**
+     * 隐藏软键盘
+     *
+     * @param mContext
+     */
+    public static void hideSoftInputFrom(Context mContext) {
+        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm.isActive()) {
+            View focusView = ((Activity) mContext).getCurrentFocus();
+            if (focusView != null)
+                imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+        }
+    }
+
+    /**
+     * 显示软键盘
+     *
+     * @param mContext
+     */
+    public static void showSoftInputFrom(Context mContext) {
+        InputMethodManager imm = (InputMethodManager) mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm.isActive()) {
+            View focusView = ((Activity) mContext).getCurrentFocus();
+            if (focusView != null)
+                imm.hideSoftInputFromWindow(focusView.getWindowToken(), 0);
+        }
+    }
+
+    public static String formatBoolean(boolean status) {
+        return status ? "是" : "否";
+    }
+
+    public static String formatTrouble(boolean status) {
+        return status ? "异常" : "正常";
+    }
+
+    /**
+     * 回收图片释放内存
+     *
+     * @param thumbnails
+     */
+    public static void recycleBitmap(Bitmap... thumbnails) {
+        try {
+            if (thumbnails != null) {
+                for (Bitmap thumbnail : thumbnails) {
+                    if (thumbnail != null && !thumbnail.isRecycled())
+                        thumbnail.recycle(); // 回收图片所占的内存
+                }
+                System.gc(); // 提醒系统及时回收
+            }
+        } catch (Exception e) {
+            LogKit.exception("回收图片异常", "异常信息：\n" + e.toString());
+        }
+    }
+
+    /**
+     * 回收图片释放内存
+     *
+     * @param thumbnails
+     */
+    public static void recycleBitmap(Collection<? extends Object> thumbnails) {
+        try {
+            if (thumbnails != null) {
+                for (Object thumbnail : thumbnails) {
+                    if (thumbnail != null && thumbnail instanceof Bitmap) {
+                        Bitmap bitmap = (Bitmap) thumbnail;
+                        if (!bitmap.isRecycled())
+                            bitmap.recycle(); // 回收图片所占的内存
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LogKit.exception("回收图片异常", "异常信息：\n" + e.toString());
+        }
+    }
+
+    /**
+     * 判断一个布尔值为真
+     *
+     * @param value
+     * @return
+     */
+    public static boolean isTrue(Boolean value) {
+        return value != null && value;
+    }
+}

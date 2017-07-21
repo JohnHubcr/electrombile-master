@@ -1,0 +1,22 @@
+package com.zenchn.electrombile.api.callback;
+
+import com.zenchn.electrombile.entity.VehicleCheckForJKInfo;
+import com.zenchn.electrombile.entity.VehicleCheckForSTInfo;
+
+/**
+ * 作    者：wangr on 2017/3/1 11:32
+ * 描    述：
+ * 修订记录：
+ */
+
+public interface VehicleCheckCallback extends GrantCallback{
+
+    void onGetVehicleCheckSuccess(VehicleCheckForSTInfo vehicleCheckForSTInfo);
+
+    void onGetVehicleCheckSuccess(VehicleCheckForJKInfo vehicleCheckForJKInfo);
+
+    void onGetVehicleCheckFailure();
+
+    void onGetVehicleCheckResponseError(String error_msg);
+
+}

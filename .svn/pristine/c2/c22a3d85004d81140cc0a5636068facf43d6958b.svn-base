@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:id="@+id/ll_homepage"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/activity_base_bg"
+    android:orientation="vertical">
+
+    <FrameLayout
+        android:id="@+id/fragment_container"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/>
+
+    <RadioGroup
+        android:id="@+id/rg_bottom_group"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:background="@color/tab_menu_bg"
+        android:orientation="horizontal"
+        android:paddingTop="5dp">
+
+        <!--android:checked="true"-->
+        <RadioButton
+            android:id="@+id/rb_main"
+            style="@style/MainTabBottom"
+            android:drawableTop="@drawable/b_main_selector"/>
+
+        <RadioButton
+            android:id="@+id/rb_message"
+            style="@style/MainTabBottom"
+            android:drawableTop="@drawable/b_notification_selector"/>
+
+        <RadioButton
+            android:id="@+id/rb_settings"
+            style="@style/MainTabBottom"
+            android:drawableTop="@drawable/b_profile_selector"/>
+
+        <RadioButton
+            android:id="@+id/rb_test"
+            style="@style/MainTabBottom"
+            android:drawableTop="@drawable/b_weather_selector"
+            android:visibility="gone"/>
+
+    </RadioGroup>
+</LinearLayout>
+

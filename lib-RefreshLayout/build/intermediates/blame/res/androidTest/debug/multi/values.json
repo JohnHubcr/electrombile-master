@@ -1,0 +1,131 @@
+[
+    {
+        "outputFile": "D:\\zdzc_ddc_temp\\electrombile-master_new\\lib-RefreshLayout\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 327,
+                    "endColumn": 74,
+                    "endOffset": 397
+                },
+                "from": {
+                    "file": "D:\\zdzc_ddc_temp\\electrombile-master_new\\lib-RefreshLayout\\build\\intermediates\\exploded-aar\\com.android.support\\recyclerview-v7\\22.2.1\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 562,
+                        "endColumn": 74,
+                        "endOffset": 632
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 402,
+                    "endColumn": 65,
+                    "endOffset": 463
+                },
+                "from": {
+                    "file": "D:\\zdzc_ddc_temp\\electrombile-master_new\\lib-RefreshLayout\\build\\intermediates\\exploded-aar\\com.android.support\\recyclerview-v7\\22.2.1\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 869,
+                        "endColumn": 65,
+                        "endOffset": 930
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "outputFile": "D:\\zdzc_ddc_temp\\electrombile-master\\lib-RefreshLayout\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 327,
+                    "endColumn": 74,
+                    "endOffset": 397
+                },
+                "from": {
+                    "file": "D:\\zdzc_ddc_temp\\electrombile-master\\lib-RefreshLayout\\build\\intermediates\\exploded-aar\\com.android.support\\recyclerview-v7\\22.2.1\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 562,
+                        "endColumn": 74,
+                        "endOffset": 632
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 402,
+                    "endColumn": 65,
+                    "endOffset": 463
+                },
+                "from": {
+                    "file": "D:\\zdzc_ddc_temp\\electrombile-master\\lib-RefreshLayout\\build\\intermediates\\exploded-aar\\com.android.support\\recyclerview-v7\\22.2.1\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 869,
+                        "endColumn": 65,
+                        "endOffset": 930
+                    }
+                }
+            }
+        ]
+    },
+    {
+        "outputFile": "D:\\zdzc_as_dds_normal\\Android\\branches\\electrombile-master_branch_zb\\lib-RefreshLayout\\build\\intermediates\\res\\merged\\androidTest\\debug\\values\\values.xml",
+        "map": [
+            {
+                "to": {
+                    "startLine": 3,
+                    "startColumn": 4,
+                    "startOffset": 327,
+                    "endColumn": 74,
+                    "endOffset": 397
+                },
+                "from": {
+                    "file": "D:\\zdzc_as_dds_normal\\Android\\branches\\electrombile-master_branch_zb\\lib-RefreshLayout\\build\\intermediates\\exploded-aar\\com.android.support\\recyclerview-v7\\22.2.1\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 5,
+                        "startColumn": 4,
+                        "startOffset": 562,
+                        "endColumn": 74,
+                        "endOffset": 632
+                    }
+                }
+            },
+            {
+                "to": {
+                    "startLine": 4,
+                    "startColumn": 4,
+                    "startOffset": 402,
+                    "endColumn": 65,
+                    "endOffset": 463
+                },
+                "from": {
+                    "file": "D:\\zdzc_as_dds_normal\\Android\\branches\\electrombile-master_branch_zb\\lib-RefreshLayout\\build\\intermediates\\exploded-aar\\com.android.support\\recyclerview-v7\\22.2.1\\res\\values\\values.xml",
+                    "position": {
+                        "startLine": 8,
+                        "startColumn": 4,
+                        "startOffset": 869,
+                        "endColumn": 65,
+                        "endOffset": 930
+                    }
+                }
+            }
+        ]
+    }
+]

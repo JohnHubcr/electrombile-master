@@ -1,0 +1,190 @@
+package com.zenchn.electrombile.api;
+
+import android.text.TextUtils;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.zenchn.electrombile.api.callback.VehicleContrailCallback;
+import com.zenchn.electrombile.api.callback.VehicleLocationCallback;
+import com.zenchn.electrombile.entity.VehicleLocationInfo;
+import com.zenchn.electrombile.kit.LogKit;
+import com.zenchn.electrombile.utils.CommonUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * 作    者：wangr on 2017/2/25 10:30
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleCoreApi extends BaseApi {
+
+    private VehicleCoreApi() {
+    }
+
+    private static class SingletonInstance {
+        private static final VehicleCoreApi INSTANCE = new VehicleCoreApi();
+    }
+
+    public static VehicleCoreApi getInstance() {
+        return SingletonInstance.INSTANCE;
+    }
+
+    /**
+     * 获取最近一次定位信息
+     *
+     * @param accessToken
+     * @param serialNumber
+     */
+    public void getLastLocation(String accessToken, final String serialNumber, final VehicleLocationCallback callback) {
+
+        mApiStore
+                .getLastLocation(accessToken, serialNumber)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+
+                            if (response.code() == 200) {
+
+                                JSONObject data = JSON.parseObject(response.body()).getJSONObject("data");
+                                VehicleLocationInfo vehicleLocationInfo = new VehicleLocationInfo();
+
+                                vehicleLocationInfo.setSerialNumber(data.getString("serialNumber"));
+                                String power = data.getString("power");
+                                vehicleLocationInfo.setPower(CommonUtils.isEmpty(power) ? "0" : power);
+                                vehicleLocationInfo.setMile(TextUtils.isEmpty(data.getString("mile")) ? "--" : data.getString("mile"));
+                                vehicleLocationInfo.setOnlineStatus(data.getIntValue("online"));
+                                vehicleLocationInfo.setSpeed(data.getString("speed"));
+                                vehicleLocationInfo.setPStatus(data.getIntValue("pStatus"));
+                                vehicleLocationInfo.setAcc(data.getIntValue("accStatus"));
+                                vehicleLocationInfo.setUtcTime(data.getLongValue("utcTime"));
+                                vehicleLocationInfo.setPowerStatus(data.getInteger("powerStatus"));
+                                vehicleLocationInfo.setRawLatitude(data.getDoubleValue("lat"));
+                                vehicleLocationInfo.setRawLongitude(data.getDoubleValue("lng"));
+                                vehicleLocationInfo.setBdLatitude(data.getDoubleValue("blat"));
+                                vehicleLocationInfo.setBdLongitude(data.getDoubleValue("blng"));
+                                vehicleLocationInfo.setGdLatitude(data.getDoubleValue("lat"));
+                                vehicleLocationInfo.setGdLongitude(data.getDoubleValue("lng"));
+
+                                LogKit.success(serialNumber + "  定位信息获取成功", "定位信息：\n" + vehicleLocationInfo.toString());
+                                callback.onGetVehicleLocationSuccess(vehicleLocationInfo);
+
+                            } else if (response.code() == 401) {
+
+                                callback.onGrantRefuse();
+                                LogKit.success(serialNumber + "  定位信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                            } else {
+                                JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                LogKit.success(serialNumber + " 定位信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                callback.onGetVehicleLocationFailure();
+                            }
+
+                        } catch (Exception e) {
+                            callback.onGetVehicleLocationFailure();
+                            LogKit.exception(serialNumber + "  定位信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        callback.onGetVehicleLocationFailure();
+                        LogKit.exception(serialNumber + "  定位信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                    }
+                });
+    }
+
+    /**
+     * 获取最近一次轨迹信息
+     *
+     * @param accessToken
+     * @param serialNumber
+     * @param equModel
+     * @param callback
+     */
+    public void getLocationList(String accessToken, String serialNumber, int equModel, VehicleContrailCallback callback) {
+        getLocationList(accessToken, serialNumber, equModel, 0, 0, callback);
+    }
+
+    /**
+     * 获取最近一次轨迹信息
+     *
+     * @param accessToken
+     * @param serialNumber
+     * @param beginTime
+     * @param endTime
+     * @param equModel
+     */
+    public void getLocationList(String accessToken, final String serialNumber, int equModel, long beginTime, long endTime, final VehicleContrailCallback callback) {
+
+        mApiStore
+                .getLocationList(
+                        accessToken,
+                        serialNumber,
+                        String.valueOf(equModel),
+                        String.valueOf(beginTime),
+                        String.valueOf(endTime))
+                .enqueue(new Callback<String>() {
+                             @Override
+                             public void onResponse(Call<String> call, Response<String> response) {
+                                 try {
+
+                                     if (response.code() == 200) {
+
+                                         JSONObject jsonObject = JSON.parseObject(response.body());
+                                         JSONObject data = jsonObject.getJSONObject("data");
+                                         JSONArray list = data.getJSONArray("list");
+                                         List<VehicleLocationInfo> mData = null;
+
+                                         if (list != null && !list.isEmpty()) {
+                                             mData = new ArrayList<>();
+                                             VehicleLocationInfo vehicleLocationInfo = null;
+                                             int size = list.size();
+                                             for (int i = 0; i < size; i++) {
+                                                 JSONObject obj = (JSONObject) list.get(i);
+                                                 vehicleLocationInfo = new VehicleLocationInfo();
+                                                 vehicleLocationInfo.setRawLatitude(obj.getDoubleValue("lat"));
+                                                 vehicleLocationInfo.setRawLongitude(obj.getDoubleValue("lng"));
+                                                 vehicleLocationInfo.setAcc(obj.getIntValue("acc"));
+                                                 vehicleLocationInfo.setUtcTime(obj.getLongValue("utcTime"));
+                                                 mData.add(vehicleLocationInfo);
+                                             }
+
+                                         }
+                                         LogKit.success(serialNumber + "  轨迹信息获取成功", "轨迹信息：\n" + (mData != null ? mData.toString() : "没有轨迹点！"));
+                                         callback.onGetVehicleContrailSuccess(mData);
+
+                                     } else if (response.code() == 401) {
+
+                                         callback.onGrantRefuse();
+                                         LogKit.success(serialNumber + "  轨迹信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                                     } else {
+                                         JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                         LogKit.success(serialNumber + " 轨迹信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                         callback.onGetVehicleContrailResponseError(errorResult.getString("error"));
+                                     }
+
+                                 } catch (Exception e) {
+                                     callback.onGetVehicleContrailFailure();
+                                     LogKit.exception(serialNumber + "  轨迹信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                                 }
+                             }
+
+                             @Override
+                             public void onFailure(Call<String> call, Throwable t) {
+                                 callback.onGetVehicleContrailFailure();
+                                 LogKit.exception(serialNumber + "  轨迹信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                             }
+                         }
+
+                );
+    }
+}

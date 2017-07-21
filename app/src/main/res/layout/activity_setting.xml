@@ -1,0 +1,195 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head_back"/>
+
+    <LinearLayout
+        android:id="@+id/ll_modify_password"
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="修改密码"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"/>
+    </LinearLayout>
+
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:id="@+id/ll_modify_account"
+        style="@style/CommonButtonStyle">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="手机号"/>
+
+        <TextView
+            android:id="@+id/tv_account"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:paddingRight="@dimen/little_padding"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_urgent_contacts"
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="紧急联系人"/>
+
+        <TextView
+            android:id="@+id/tv_urgent_contact"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:paddingRight="@dimen/little_padding"
+            android:text="18627998966"/>
+
+        <RelativeLayout
+            android:id="@+id/ra_setting_point"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:paddingRight="@dimen/little_padding"
+            android:visibility="gone">
+
+            <ImageView
+                android:layout_width="5dp"
+                android:layout_height="5dp"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="@dimen/little_margin"
+                android:src="@drawable/small_red_dot"/>
+        </RelativeLayout>
+
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="3dp"
+        android:paddingLeft="@dimen/module_common_padding"
+        android:paddingRight="@dimen/module_common_padding"
+        android:paddingTop="3dp">
+
+        <TextView
+            style="@style/BaseTextViewDescStyle"
+            android:layout_marginTop="@dimen/small_margin"
+            android:text="@string/urgent_contacts_desc"
+            android:textSize="9sp"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_notification"
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="消息通知"/>
+
+        <TextView
+            android:id="@+id/tv_notification_isOpen"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:paddingRight="@dimen/little_padding"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"/>
+    </LinearLayout>
+
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:id="@+id/ll_clear_cache"
+        style="@style/CommonButtonStyle">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="清理缓存"/>
+
+        <TextView
+            android:id="@+id/tv_cache_size"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:paddingRight="@dimen/little_padding"
+            android:text="3M"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_feedback"
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="20dp">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="用户反馈"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"/>
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        android:id="@+id/ll_about"
+        style="@style/CommonButtonStyle">
+
+        <TextView
+            android:id="@+id/tv_about"
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="@string/about_app"/>
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/next"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_quit"
+        style="@style/GradientButtonStyle"
+        android:layout_marginTop="20dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="退出登录"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+</LinearLayout>

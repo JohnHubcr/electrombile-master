@@ -1,0 +1,118 @@
+package com.zenchn.electrombile.entity;
+
+import java.io.Serializable;
+
+/**
+ * 作    者：wangr on 2017/3/1 16:19
+ * 描    述： 
+ * 修订记录：
+ */
+public class VehicleContrailListInfo implements Serializable {
+
+    private String mileage;
+    private String mileageUnit;
+    private String timeSpanUnit;
+    private String timeSpan;
+    private String speed;
+    private String speedUnit;
+    private long startTime;
+    private String timeRange;
+    private String startDate;
+    private String weekday;
+
+    public String getMileage() {
+        return mileage;
+    }
+
+    public void setMileage(String mileage) {
+        this.mileage = mileage;
+    }
+
+    public String getMileageUnit() {
+        return mileageUnit;
+    }
+
+    public void setMileageUnit(String mileageUnit) {
+        this.mileageUnit = mileageUnit;
+    }
+
+    public String getTimeSpan() {
+        return timeSpan;
+    }
+
+    public void setTimeSpan(String timeSpan) {
+        this.timeSpan = timeSpan;
+    }
+
+    public String getSpeed() {
+        return speed;
+    }
+
+    public void setSpeed(String speed) {
+        this.speed = speed;
+    }
+
+    public String getSpeedUnit() {
+        return speedUnit;
+    }
+
+    public void setSpeedUnit(String speedUnit) {
+        this.speedUnit = speedUnit;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(long startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getTimeRange() {
+        return timeRange;
+    }
+
+    public void setTimeRange(String timeRange) {
+        this.timeRange = timeRange;
+    }
+
+    public String getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getWeekday() {
+        return weekday;
+    }
+
+    public void setWeekday(String weekday) {
+        this.weekday = weekday;
+    }
+
+    public String getTimeSpanUnit() {
+        return timeSpanUnit;
+    }
+
+    public void setTimeSpanUnit(String timeSpanUnit) {
+        this.timeSpanUnit = timeSpanUnit;
+    }
+
+    @Override
+    public String toString() {
+        return "MotorContrailListInfo{" +
+                "mileage='" + mileage + '\'' +
+                ", mileageUnit='" + mileageUnit + '\'' +
+                ", timeSpanUnit='" + timeSpanUnit + '\'' +
+                ", timeSpan='" + timeSpan + '\'' +
+                ", speed='" + speed + '\'' +
+                ", speedUnit='" + speedUnit + '\'' +
+                ", startTime=" + startTime +
+                ", timeRange='" + timeRange + '\'' +
+                ", startDate='" + startDate + '\'' +
+                ", weekday='" + weekday + '\'' +
+                '}';
+    }
+}

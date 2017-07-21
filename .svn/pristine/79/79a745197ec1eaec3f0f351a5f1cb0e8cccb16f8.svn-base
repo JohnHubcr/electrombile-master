@@ -1,0 +1,35 @@
+package com.zenchn.electrombile.presenter.impl;
+
+import com.zenchn.electrombile.entity.FeedbackInfo;
+import com.zenchn.electrombile.presenter.FeedbackPresenter;
+import com.zenchn.electrombile.ui.view.FeedbackView;
+
+/**
+ * 作    者：wangr on 2017/2/22 15:06
+ * 描    述：
+ * 修订记录：
+ */
+public class FeedbackPresenterImpl implements FeedbackPresenter {
+
+    private FeedbackView feedbackView;
+
+    public FeedbackPresenterImpl(FeedbackView feedbackView) {
+        this.feedbackView = feedbackView;
+    }
+
+    @Override
+    public void autoSaveContent(boolean isAutoSave) {
+
+    }
+
+    @Override
+    public void uploadFeedback(String accessToken, FeedbackInfo feedbackInfo) {
+
+    }
+
+    @Override
+    public void onDestroy() {
+
+    }
+
+}

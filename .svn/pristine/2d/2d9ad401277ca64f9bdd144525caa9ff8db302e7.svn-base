@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/activity_base_bg"
+    android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head_back" />
+
+    <LinearLayout
+        android:gravity="center"
+        android:background="@color/module_normal_bg"
+        android:layout_marginLeft="@dimen/little_margin"
+        android:layout_marginTop="@dimen/little_margin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:padding="@dimen/little_padding"
+            android:background="@null"
+            android:textSize="14sp"
+            android:textColor="@color/white"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColorHint="@color/base_text_color_grey"
+            android:hint="搜索附近充电网点" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_marginLeft="@dimen/small_margin"
+        android:padding="@dimen/little_padding"
+        android:textColor="@color/base_text_color_grey"
+        android:text="附近充电网点"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <cn.bingoogolapple.refreshlayout.BGARefreshLayout
+        android:id="@+id/bl_refresh"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@color/fragment_base_bg"
+        android:orientation="vertical">
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/rv"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="10dp"/>
+    </cn.bingoogolapple.refreshlayout.BGARefreshLayout>
+
+</LinearLayout>

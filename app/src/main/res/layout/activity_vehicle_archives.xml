@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head_back"/>
+
+    <LinearLayout
+        android:id="@+id/ll_exclusive_service"
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="@dimen/common_margin">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="@dimen/little_margin"
+            android:src="@drawable/vip"/>
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="专属服务"/>
+
+        <TextView
+            android:id="@+id/tv_status"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:text="未开通"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="@dimen/common_margin">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="品牌"/>
+
+        <TextView
+            android:id="@+id/tv_vehicle_brand"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:text="--"/>
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="型号"/>
+
+        <TextView
+            android:id="@+id/tv_vehicle_model"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:text="--"/>
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="电机编号"/>
+
+        <TextView
+            android:id="@+id/tv_machine_number"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:text="--"/>
+
+    </LinearLayout>
+
+    <include
+        layout="@layout/include_separate_transparent_view"></include>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="车架编号"/>
+
+        <TextView
+            android:id="@+id/tv_motor_no"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:text="--"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        style="@style/CommonButtonStyle"
+        android:layout_marginTop="@dimen/common_margin">
+
+        <TextView
+            style="@style/CommonButtonLeftTextViewStyle"
+            android:text="购买时间"/>
+
+        <TextView
+            android:id="@+id/tv_pay_time"
+            style="@style/CommonButtonRightTextViewStyle"
+            android:text="--"/>
+
+    </LinearLayout>
+
+</LinearLayout>

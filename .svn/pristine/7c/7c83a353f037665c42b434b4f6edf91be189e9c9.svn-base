@@ -1,0 +1,265 @@
+package com.zenchn.electrombile.ui.fragment;
+
+import android.view.View;
+import android.widget.TextView;
+
+import com.baidu.mapapi.map.BitmapDescriptor;
+import com.baidu.mapapi.map.BitmapDescriptorFactory;
+import com.baidu.mapapi.map.MapStatusUpdate;
+import com.baidu.mapapi.map.MapStatusUpdateFactory;
+import com.baidu.mapapi.map.MapView;
+import com.baidu.mapapi.map.MarkerOptions;
+import com.baidu.mapapi.map.PolylineOptions;
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.model.LatLngBounds;
+import com.zenchn.electrombile.Constants;
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.base.BaseMapFragment;
+import com.zenchn.electrombile.entity.VehicleLocationInfo;
+import com.zenchn.electrombile.eventBus.VehicleContrailListEvent;
+import com.zenchn.electrombile.eventBus.VehicleContrailQueryEvent;
+import com.zenchn.electrombile.eventBus.VehicleContrailQueryListEvent;
+import com.zenchn.electrombile.eventBus.VehicleLocationEvent;
+import com.zenchn.electrombile.utils.MapUtils;
+import com.zenchn.electrombile.widget.PickerView.TimePickerView;
+import com.zenchn.mlibrary.utils.DateUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+
+/**
+ * 作    者：wangr on 2017/2/24 15:40
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleContrailFragment extends BaseMapFragment {
+
+    @BindView(R.id.mapView)
+    MapView mapView;
+    @BindView(R.id.tv_start_date)
+    TextView tvStartDate;
+    @BindView(R.id.tv_end_date)
+    TextView tvEndDate;
+
+    private BitmapDescriptor startIoc = BitmapDescriptorFactory.fromResource(R.drawable.from);
+    private BitmapDescriptor endIoc = BitmapDescriptorFactory.fromResource(R.drawable.destination);
+    private BitmapDescriptor vehicleIoc = BitmapDescriptorFactory.fromResource(R.drawable.moto_location);
+
+    private TimePickerView pvTime;
+
+    private long startTime;
+    private long endTime;
+    private boolean isFirst = true;
+
+    @Override
+    public boolean useEventBus() {
+        return true;
+    }
+
+    @Override
+    protected String isHasTitle() {
+        return null;
+    }
+
+    @Override
+    protected int getContentLayoutRes() {
+        return R.layout.fragment_motor_contrail;
+    }
+
+    @Override
+    protected MapView getMapView() {
+        return mapView;
+    }
+
+    @Override
+    protected void initMapData() {
+
+    }
+
+    @Override
+    protected void initData() {
+        initWidget();
+    }
+
+
+    /**
+     * @param startUtcTime
+     * @param endUtcTime
+     */
+    private void setTimeScale(long startUtcTime, long endUtcTime) {
+        if (startUtcTime > endUtcTime) {
+            long temp = endUtcTime;
+            endUtcTime = startUtcTime;
+            startUtcTime = temp;
+        }
+        startTime = startUtcTime;
+        String startDate = DateUtils.convertDateToString(startUtcTime, Constants.YEAR_MONTH_DAY_HOUR_MIN);
+        tvStartDate.setText(startDate);
+
+        endTime = endUtcTime;
+        String endDate = DateUtils.convertDateToString(endUtcTime, Constants.YEAR_MONTH_DAY_HOUR_MIN);
+        tvEndDate.setText(endDate);
+    }
+
+    private void initWidget() {
+        // 时间选择器
+        pvTime = new TimePickerView(getActivity(), TimePickerView.Type.ALL);
+    }
+
+    @Subscribe(sticky = true)
+    public void onEventMainThread(VehicleContrailListEvent event) {
+        showVehicleContrail(event.getVehicleLocationInfoList());
+    }
+
+    @Subscribe(sticky = true)
+    public void onEventMainThread(VehicleLocationEvent event) {
+        VehicleLocationInfo vehicleLocationInfo = event.getVehicleLocationInfo();
+        if (vehicleLocationInfo != null) {
+            LatLng latLng = new LatLng(vehicleLocationInfo.getBdLatitude(), vehicleLocationInfo.getBdLongitude());
+            setVehiclePoint(latLng);
+        }
+    }
+
+    @Subscribe
+    public void onEventMainThread(VehicleContrailQueryListEvent event) {
+        showVehicleContrail(event.getVehicleLocationInfoList());
+    }
+
+    /**
+     * 处理轨迹信息
+     *
+     * @param vehicleLocationInfoList
+     */
+    private void showVehicleContrail(List<VehicleLocationInfo> vehicleLocationInfoList) {
+        if (vehicleLocationInfoList == null || vehicleLocationInfoList.isEmpty()) {
+            showResMessage(isFirst ? R.string.query_contrail_recent : R.string.query_contrail_no_data);
+        } else {
+            drawTrace(vehicleLocationInfoList);
+        }
+        isFirst = false;
+    }
+
+    /**
+     * 设置车辆位置
+     *
+     * @param latLng
+     */
+    private void setVehiclePoint(LatLng latLng) {
+        mBaiduMap.clear();//清理轨迹
+        MarkerOptions endMarker = new MarkerOptions().position(latLng).icon(vehicleIoc);
+        endMarker.animateType(MarkerOptions.MarkerAnimateType.grow);
+        mBaiduMap.addOverlay(endMarker);
+        MapStatusUpdate msuLocation = MapStatusUpdateFactory.newLatLng(latLng);
+        mBaiduMap.setMapStatus(msuLocation);
+    }
+
+    /**
+     * 绘制轨迹
+     *
+     * @param vehicleLocationInfoList
+     */
+    protected void drawTrace(List<VehicleLocationInfo> vehicleLocationInfoList) {
+        mBaiduMap.clear();//清理轨迹
+        if (vehicleLocationInfoList.size() < 2) {
+            showResMessage(R.string.query_contrail_very_short);
+            return;
+        }
+
+        List<LatLng> latLngPolygon = new ArrayList<>();
+        LatLngBounds.Builder builder = new LatLngBounds.Builder();
+
+        if (vehicleLocationInfoList != null) {
+            int size = vehicleLocationInfoList.size();
+            for (int i = 0; i < size; i++) {
+                VehicleLocationInfo motorStatusInfo = vehicleLocationInfoList.get(i);
+                LatLng convertLatLng = MapUtils.transformFromWGToBD(new LatLng(motorStatusInfo.getRawLatitude(), motorStatusInfo.getRawLongitude()));
+                latLngPolygon.add(convertLatLng);
+                builder.include(convertLatLng);
+            }
+
+            if (latLngPolygon.size() > 1) {
+                PolylineOptions po = new PolylineOptions().width(15).colorsValues(Constants.colorList).points(latLngPolygon);
+                mBaiduMap.addOverlay(po);
+
+                //设置时间范围
+                setTimeScale(vehicleLocationInfoList.get(0).getUtcTime(), vehicleLocationInfoList.get(vehicleLocationInfoList.size() - 1).getUtcTime());
+
+                // 起点
+                MarkerOptions startMarker = new MarkerOptions().position(latLngPolygon.get(latLngPolygon.size() - 1)).icon(startIoc);
+                startMarker.animateType(MarkerOptions.MarkerAnimateType.grow);
+                mBaiduMap.addOverlay(startMarker);
+
+
+                LatLngBounds latLngBounds = builder.build();
+                mBaiduMap.setMapStatus(MapStatusUpdateFactory.newLatLngBounds(latLngBounds));
+
+                // 终点
+                MarkerOptions endMarker = new MarkerOptions().position(latLngPolygon.get(0)).icon(endIoc);
+                endMarker.animateType(MarkerOptions.MarkerAnimateType.grow);
+                mBaiduMap.addOverlay(endMarker);
+
+            }
+        }
+    }
+
+    @OnClick({R.id.ll_start_date, R.id.ll_end_date})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.ll_start_date:// 选择开始时间
+
+                // 时间选择后回调
+                pvTime.setOnTimeSelectListener(new TimePickerView.OnTimeSelectListener() {
+
+                    @Override
+                    public void onTimeSelect(Date date) {
+                        String startDate = DateUtils.convertDateToString(date, Constants.YEAR_MONTH_DAY_HOUR_MIN);
+                        tvStartDate.setText(startDate);
+                        startTime = date.getTime();
+                        queryMotorContrail();
+                    }
+
+                });
+                pvTime.show();
+                break;
+            case R.id.ll_end_date:// 选择结束时间
+
+                // 时间选择后回调
+                pvTime.setOnTimeSelectListener(new TimePickerView.OnTimeSelectListener() {
+
+                    @Override
+                    public void onTimeSelect(Date date) {
+                        String endDate = DateUtils.convertDateToString(date, Constants.YEAR_MONTH_DAY_HOUR_MIN);
+                        tvEndDate.setText(endDate);
+                        endTime = date.getTime();
+                        queryMotorContrail();
+                    }
+
+                });
+                pvTime.show();
+                break;
+        }
+    }
+
+    public void queryMotorContrail() {
+        if (startTime == 0 || endTime == 0) {
+            return;
+        }
+        if (!DateUtils.compareTime(startTime, endTime)) {
+            showResMessage(R.string.query_contrail_time_error);
+            return;
+        }
+        if (DateUtils.daysBetween(startTime, endTime, false) > 7) {
+            showResMessage(R.string.query_contrail_time_overstep);
+            return;
+        }
+        EventBus.getDefault().post(new VehicleContrailQueryEvent(startTime, endTime));
+    }
+
+}

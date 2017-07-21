@@ -1,0 +1,75 @@
+package com.zenchn.electrombile.entity;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
+/**
+ * Created by wangr on 2016/11/22.
+ */
+public class VehicleCheckForSTInfo implements Serializable, Parcelable {
+
+    private String vehicleConditionStatus;// 车况故障状态
+    private String bmsTrouble;// 电池故障
+
+    public VehicleCheckForSTInfo() {
+    }
+
+    public VehicleCheckForSTInfo(String vehicleConditionStatus, String bmsTrouble) {
+        this.vehicleConditionStatus = vehicleConditionStatus;
+        this.bmsTrouble = bmsTrouble;
+    }
+
+    public String getVehicleConditionStatus() {
+        return vehicleConditionStatus;
+    }
+
+    public void setVehicleConditionStatus(String vehicleConditionStatus) {
+        this.vehicleConditionStatus = vehicleConditionStatus;
+    }
+
+    public String getBmsTrouble() {
+        return bmsTrouble;
+    }
+
+    public void setBmsTrouble(String bmsTrouble) {
+        this.bmsTrouble = bmsTrouble;
+    }
+
+    @Override
+    public String toString() {
+        return "MotorCheckForSTInfo{" +
+                "vehicleConditionStatus='" + vehicleConditionStatus + '\'' +
+                ", bmsTrouble='" + bmsTrouble + '\'' +
+                '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.vehicleConditionStatus);
+        dest.writeString(this.bmsTrouble);
+    }
+
+    protected VehicleCheckForSTInfo(Parcel in) {
+        this.vehicleConditionStatus = in.readString();
+        this.bmsTrouble = in.readString();
+    }
+
+    public static final Creator<VehicleCheckForSTInfo> CREATOR = new Creator<VehicleCheckForSTInfo>() {
+        @Override
+        public VehicleCheckForSTInfo createFromParcel(Parcel source) {
+            return new VehicleCheckForSTInfo(source);
+        }
+
+        @Override
+        public VehicleCheckForSTInfo[] newArray(int size) {
+            return new VehicleCheckForSTInfo[size];
+        }
+    };
+}

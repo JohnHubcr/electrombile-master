@@ -1,0 +1,131 @@
+package com.zenchn.electrombile.entity;
+
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.io.Serializable;
+
+
+/**
+ * 作    者：wangr on 2017/3/8 14:47
+ * 描    述：保险保单描述类
+ * 修订记录：
+ */
+public class InsurancePolicyInfo implements Parcelable, Serializable {
+
+    String name;// 保险名称
+    String remark;// 商品描述
+    String category;// 保险公司名称
+    String protectionStartTime;//保险生效时间
+    String protectionEndTime;//保险到期时间
+    String phone;// 服务热线
+
+    public InsurancePolicyInfo() {
+    }
+
+    public InsurancePolicyInfo(String name, String remark, String category, String protectionStartTime, String protectionEndTime, String phone) {
+        this.name = name;
+        this.remark = remark;
+        this.category = category;
+        this.protectionStartTime = protectionStartTime;
+        this.protectionEndTime = protectionEndTime;
+        this.phone = phone;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getProtectionStartTime() {
+        return protectionStartTime;
+    }
+
+    public void setProtectionStartTime(String protectionStartTime) {
+        this.protectionStartTime = protectionStartTime;
+    }
+
+    public String getProtectionEndTime() {
+        return protectionEndTime;
+    }
+
+    public void setProtectionEndTime(String protectionEndTime) {
+        this.protectionEndTime = protectionEndTime;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
+    @Override
+    public String toString() {
+        return "InsurancePolicyInfo{" +
+                "name='" + name + '\'' +
+                ", remark='" + remark + '\'' +
+                ", category='" + category + '\'' +
+                ", protectionStartTime='" + protectionStartTime + '\'' +
+                ", protectionEndTime='" + protectionEndTime + '\'' +
+                ", phone='" + phone + '\'' +
+                '}';
+    }
+
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.name);
+        dest.writeString(this.remark);
+        dest.writeString(this.category);
+        dest.writeString(this.protectionStartTime);
+        dest.writeString(this.protectionEndTime);
+        dest.writeString(this.phone);
+    }
+
+    protected InsurancePolicyInfo(Parcel in) {
+        this.name = in.readString();
+        this.remark = in.readString();
+        this.category = in.readString();
+        this.protectionStartTime = in.readString();
+        this.protectionEndTime = in.readString();
+        this.phone = in.readString();
+    }
+
+    public static final Creator<InsurancePolicyInfo> CREATOR = new Creator<InsurancePolicyInfo>() {
+        @Override
+        public InsurancePolicyInfo createFromParcel(Parcel source) {
+            return new InsurancePolicyInfo(source);
+        }
+
+        @Override
+        public InsurancePolicyInfo[] newArray(int size) {
+            return new InsurancePolicyInfo[size];
+        }
+    };
+}

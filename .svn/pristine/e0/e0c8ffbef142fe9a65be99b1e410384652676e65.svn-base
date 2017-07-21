@@ -1,0 +1,240 @@
+package com.zenchn.electrombile.ui.activity;
+
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.KeyEvent;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.app.Constants;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.eventBus.TcpCmdRequestStatusEvent;
+import com.zenchn.electrombile.eventBus.TcpCmdResultEvent;
+import com.zenchn.electrombile.eventBus.UpdateDataEvent;
+import com.zenchn.electrombile.kit.ApplicationKit;
+import com.zenchn.electrombile.presenter.HomePagePresenter;
+import com.zenchn.electrombile.presenter.impl.HomePagePresenterImpl;
+import com.zenchn.electrombile.router.Router;
+import com.zenchn.electrombile.ui.fragment.HomeFragment;
+import com.zenchn.electrombile.ui.fragment.HomeSimpleFragment;
+import com.zenchn.electrombile.ui.fragment.MessageFragment;
+import com.zenchn.electrombile.ui.fragment.PersonalFragment;
+import com.zenchn.electrombile.ui.view.HomePageView;
+import com.zenchn.electrombile.utils.EquModelUtils;
+import com.zenchn.electrombile.widget.Dialog.CommonDialogFactory;
+import com.zenchn.electrombile.wrapper.ACacheWrapper;
+import com.zenchn.mlibrary.utils.ToastUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+
+/**
+ * 作    者：wangr on 2017/2/24 11:38
+ * 描    述：首页功能菜单
+ * 修订记录：
+ */
+public class HomePageActivity extends BaseActivity implements HomePageView {
+
+    @BindView(R.id.rg_bottom_group)
+    RadioGroup rgBottomGroup;
+    @BindView(R.id.ll_homepage)
+    LinearLayout llHomepage;
+
+    private List<Fragment> fragments;
+    private HomePagePresenter presenter;
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        presenter.onDestroy();
+    }
+
+    public HomePageActivity() {
+        presenter = new HomePagePresenterImpl(this);
+    }
+
+    @Override
+    public boolean useEventBus() {
+        return true;
+    }
+
+    @Override
+    public boolean useUiHandler() {
+        return true;
+    }
+
+    private void initCache() {
+        ACacheWrapper.clearTemp();
+    }
+
+    /**
+     * 初始化信鸽服务
+     */
+    private void initXgService() {
+        Intent xgPushService = ApplicationKit.getInstance().getXgPushServiceIntent();
+        startService(xgPushService);
+    }
+
+    /**
+     * 添加fragment
+     */
+    private void initFragments() {
+        fragments = new ArrayList<>();
+        Boolean isHideFunction = EquModelUtils.isHideFunction(loginInfo.getEquModel());
+        fragments.add(isHideFunction == null || !isHideFunction ? new HomeFragment() : new HomeSimpleFragment());
+        fragments.add(new MessageFragment());
+        fragments.add(new PersonalFragment());
+    }
+
+    /**
+     * 增加监听
+     */
+    private void addListener() {
+        rgBottomGroup.setOnCheckedChangeListener(checkedListener);
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_homepage;
+    }
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+        initXgService();
+        addListener();
+        initFragments();
+        initCache();
+        initData();
+    }
+
+    @Override
+    protected void initData() {
+        ((RadioButton) rgBottomGroup.getChildAt(0)).setChecked(true);//设置首选页面
+
+        ApplicationKit.getInstance().clearNotify();//清理通知
+        if (EquModelUtils.isHideFunction(loginInfo.getEquModel()) != null)
+            startPollingService();//开启轮询服务
+    }
+
+    private void startPollingService() {
+        Intent coreServiceIntent = ApplicationKit.getInstance().getCoreServiceIntent();
+        coreServiceIntent.putExtra("serialNumber", loginInfo.getSerialNumber());
+        coreServiceIntent.putExtra("accessToken", loginInfo.getAccessToken());
+        coreServiceIntent.putExtra("authorizationPsw", loginInfo.getAuthorizationPsw());
+        coreServiceIntent.putExtra("equModel", loginInfo.getEquModel());
+        startService(coreServiceIntent);//开启轮询服务
+    }
+
+    @Subscribe
+    public void onEventMainThread(UpdateDataEvent event) {
+        ApplicationKit
+                .getInstance()
+                .updateWeather();
+    }
+
+    @Subscribe(sticky = true, priority = 0)
+    public void onEventMainThread(TcpCmdResultEvent event) {
+        String tcpCmdName = event.getTcpCmdName();
+        boolean executeSuccess = event.isExecuteSuccess();
+        EventBus.getDefault().cancelEventDelivery(event);//取消事件继续发送
+        EventBus.getDefault().removeStickyEvent(event);//删除该事件
+        if (ApplicationKit.getInstance().getTopActivity() == this)
+            CommonDialogFactory
+                    .createQueryCmdDialog(this, String.format(getString(executeSuccess ? R.string.cmd_execute_success : R.string.cmd_execute_failure), tcpCmdName), executeSuccess, Constants
+                            .SHOW_DIALOG_LONG_TIME);
+    }
+
+    @Subscribe
+    public void onEventMainThread(TcpCmdRequestStatusEvent event) {
+        String tcpCmdName = event.getTcpCmdName();
+        boolean sendSuccess = event.isSendSuccess();
+        if (ApplicationKit.getInstance().getTopActivity() == this)
+            CommonDialogFactory
+                    .createSendTcpCmdStatusDialog(this, String.format(getString(sendSuccess ? R.string.cmd_send_success : R.string.cmd_execute_failure), tcpCmdName), sendSuccess, Constants
+                            .SHOW_DIALOG_SHORT_TIME);
+    }
+
+    /**
+     * 增加RadioGroup点击的监听
+     *
+     * @param group         设置了监听的 RadioGroup
+     * @param checkedId     选中的RadioButton的 id
+     * checkedId -> View -> index -> Fragment
+     */
+    private RadioGroup.OnCheckedChangeListener checkedListener = new RadioGroup.OnCheckedChangeListener() {
+
+        @Override
+        public void onCheckedChanged(RadioGroup group, int checkedId) {
+            ToastUtils.cancelCurrentToast();
+            View child = group.findViewById(checkedId);
+            int index = group.indexOfChild(child);
+            Fragment fragment = fragments.get(index);
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, fragment)
+                    .commit();
+        }
+    };
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (KeyEvent.KEYCODE_BACK == keyCode) {
+            presenter.exit(mHandler);
+            return false;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+    @Override
+    public void logout() {
+        presenter.logout(loginInfo.getLoginName(), loginInfo.getAccessToken());
+    }
+
+    @Override
+    public void updateProtectionStatus(int protectionStatus) {
+        loginInfo.setProtectionStatus(protectionStatus);
+        ApplicationKit.getInstance().getLoginInfo().setProtectionStatus(protectionStatus);
+    }
+
+    @Override
+    public void updateUrgentContact(String urgentContact) {
+        loginInfo.setOtherPhone(urgentContact);
+        ApplicationKit.getInstance().getLoginInfo().setOtherPhone(urgentContact);
+    }
+
+    @Override
+    public void setViewBuffered(View view) {
+        super.disabledView(view);
+    }
+
+    @Override
+    public void showExitMessage() {
+        showResMessage(R.string.common_again_exit);
+    }
+
+    @Override
+    public void exit() {
+        ToastUtils.cancelCurrentToast();
+        ApplicationKit.getInstance().exitApp();
+    }
+
+    public static void launch(Activity activity) {
+        Router
+                .newIntent()
+                .from(activity)
+                .to(HomePageActivity.class)
+                .data(new Bundle())
+                .launch();
+    }
+
+}

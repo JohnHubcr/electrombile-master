@@ -1,0 +1,218 @@
+package com.zenchn.electrombile.wrapper;
+
+import com.zenchn.electrombile.BuildConf;
+import com.zenchn.electrombile.entity.AlarmMessageInfo;
+import com.zenchn.electrombile.entity.FeedbackInfo;
+import com.zenchn.electrombile.entity.InsuranceActivateInfo;
+import com.zenchn.electrombile.entity.InsuranceClaimInfo;
+import com.zenchn.electrombile.entity.LoginInfo;
+import com.zenchn.electrombile.entity.UserInfo;
+import com.zenchn.electrombile.entity.VehicleRecordInfo;
+import com.zenchn.electrombile.entity.WeatherInfo;
+import com.zenchn.mlibrary.cache.ACache;
+
+/**
+ * 作    者：wangr on 2017/3/4 20:54
+ * 描    述：
+ * 修订记录：
+ */
+
+public class ACacheWrapper {
+
+    private static ACache aCache;
+    private static String ID = "";//缓存资源的标识符
+
+    private ACacheWrapper() {
+    }
+
+    public static void init(ACache aCache) {
+        ACacheWrapper.aCache = aCache;
+    }
+
+    public static void init(ACache aCache, String ID) {
+        ACacheWrapper.aCache = aCache;
+        ACacheWrapper.ID = ID;
+    }
+
+    public static void addMarking(String ID) {
+        ACacheWrapper.ID = ID;
+    }
+
+    public static void clearTemp() {
+        aCache.remove(BuildConf.CacheKey.TEMP_INSURANCE_POLICY_INFO);
+        aCache.remove(BuildConf.CacheKey.TEMP_MOTOR_CHECK_INFO);
+        aCache.remove(BuildConf.CacheKey.TEMP_GPS_LINK_TOKEN);
+        aCache.remove(BuildConf.CacheKey.TEMP_ALARM_MESSAGE);
+        aCache.remove(BuildConf.CacheKey.TEMP_INSURANCE_APPLY_CLAIM_INFO);
+    }
+
+    /**
+     * 登录信息
+     * --------------------------------------------------------------------
+     */
+    public static void saveLoginNameHistory(String loginName) {
+        aCache.put(BuildConf.CacheKey.SAVE_USER_LOGIN_NAME_HISTORY, loginName);
+    }
+
+    public static String getLoginNameHistory() {
+        return aCache.getAsString(BuildConf.CacheKey.SAVE_USER_LOGIN_NAME_HISTORY);
+    }
+
+    public static void saveUserInfo(UserInfo userInfo) {
+        aCache.put(BuildConf.CacheKey.SAVE_USER_INFO, userInfo);
+    }
+
+    public static UserInfo getUserInfo() {
+        return (UserInfo) aCache.getAsObject(BuildConf.CacheKey.SAVE_USER_INFO);
+    }
+
+    public static void removeUserInfo() {
+        aCache.remove(BuildConf.CacheKey.SAVE_USER_INFO);
+    }
+
+    public static void tempLoginInfo(LoginInfo loginInfo) {
+        aCache.put(BuildConf.CacheKey.TEMP_LOGIN_INFO, loginInfo);
+    }
+
+    public static LoginInfo getLoginInfo() {
+        return (LoginInfo) aCache.getAsObject(BuildConf.CacheKey.TEMP_LOGIN_INFO);
+    }
+
+    /**
+     * 用户退出时间
+     * --------------------------------------------------------------------
+     */
+
+    public static void saveLogoutTime(String loginName, long logoutTime) {
+        aCache.putEverything(loginName + BuildConf.CacheKey.SAVE_LOGOUT_TIME, logoutTime);
+    }
+
+    public static long getLogoutTime(String loginName) {
+        return aCache.getAsLong(loginName + BuildConf.CacheKey.SAVE_LOGOUT_TIME, 0);
+    }
+
+
+    /**
+     * 报警消息开关
+     * --------------------------------------------------------------------
+     */
+    public static void saveAlarmNotificationStatus(boolean isOpen) {
+        aCache.putEverything(ID + BuildConf.CacheKey.SAVE_NOTIFICATION_SWITCH, isOpen);
+    }
+
+    public static boolean getAlarmNotificationStatus() {
+        return aCache.getAsBoolean(ID + BuildConf.CacheKey.SAVE_NOTIFICATION_SWITCH, false);
+    }
+
+
+    /**
+     * 控车限速百分比 (默认值为-1)
+     * --------------------------------------------------------------------
+     */
+    public static void saveVehicleSpeedLimitOption(int option) {
+        aCache.putEverything(BuildConf.CacheKey.TEMP_VEHICLE_SPEED_LIMIT_OPTION, option);
+    }
+
+    public static int getVehicleSpeedLimitOption() {
+        return aCache.getAsInt(BuildConf.CacheKey.TEMP_VEHICLE_SPEED_LIMIT_OPTION, -1);
+    }
+
+    /**
+     * 最近一条报警消息
+     * --------------------------------------------------------------------
+     */
+    public static void tempAlarmMessage(AlarmMessageInfo alarmMessage) {
+        aCache.put(BuildConf.CacheKey.TEMP_ALARM_MESSAGE, alarmMessage);
+    }
+
+    public static AlarmMessageInfo getAlarmMessage() {
+        return (AlarmMessageInfo) aCache.getAsObject(BuildConf.CacheKey.TEMP_ALARM_MESSAGE);
+    }
+
+
+    /**
+     * 保险激活信息
+     * --------------------------------------------------------------------
+     */
+
+    public static void saveInsuranceActivateInfo(InsuranceActivateInfo insuranceActivateInfo) {
+        aCache.put(ID + BuildConf.CacheKey.SAVE_INSURANCE_ACTIVATE_INFO, insuranceActivateInfo);
+    }
+
+    public static InsuranceActivateInfo getInsuranceActivateInfo() {
+        return (InsuranceActivateInfo) aCache.getAsObject(ID + BuildConf.CacheKey.SAVE_INSURANCE_ACTIVATE_INFO);
+    }
+
+    /**
+     * 保险理赔信息
+     * --------------------------------------------------------------------
+     */
+    public static void saveInsuranceClaimInfo(InsuranceClaimInfo insuranceClaimInfo) {
+        aCache.put(ID + BuildConf.CacheKey.SAVE_INSURANCE_CLAIM_INFO, insuranceClaimInfo);
+    }
+
+    public static InsuranceClaimInfo getInsuranceClaimInfo() {
+        return (InsuranceClaimInfo) aCache.getAsObject(ID + BuildConf.CacheKey.SAVE_INSURANCE_CLAIM_INFO);
+    }
+
+    /**
+     * 车辆档案信息(常用车辆)
+     * --------------------------------------------------------------------
+     */
+
+    public static void tempVehicleRecordInfo(VehicleRecordInfo vehicleRecordInfo) {
+        aCache.put(ID + BuildConf.CacheKey.TEMP_VEHICLE_RECORD_INFO, vehicleRecordInfo);
+    }
+
+    public static VehicleRecordInfo getVehicleRecordInfo() {
+        return (VehicleRecordInfo) aCache.getAsObject(ID + BuildConf.CacheKey.TEMP_VEHICLE_RECORD_INFO);
+    }
+
+
+    /**
+     * 天气信息
+     * --------------------------------------------------------------------
+     */
+
+    public static void saveWeatherInfo(WeatherInfo weatherInfo) {
+        aCache.put(BuildConf.CacheKey.SAVE_WEATHER_INFO, weatherInfo);
+    }
+
+    public static WeatherInfo getWeatherInfo() {
+        return (WeatherInfo) aCache.getAsObject(BuildConf.CacheKey.SAVE_WEATHER_INFO);
+    }
+
+
+    /**
+     * 波导接口token (缓存7000s)
+     * --------------------------------------------------------------------
+     */
+
+    public static void tempGPSLinkToken(String authorization) {
+        aCache.putEverything(ID + BuildConf.CacheKey.TEMP_GPS_LINK_TOKEN, authorization, 7000);
+    }
+
+    public static String getGPSLinkToken() {
+        return aCache.getAsString(ID + BuildConf.CacheKey.TEMP_GPS_LINK_TOKEN);
+    }
+
+
+    /**
+     * 用户反馈(30天不提交自动删除)
+     * --------------------------------------------------------------------
+     */
+
+    public static void saveFeedbackInfo(FeedbackInfo feedbackInfo) {
+        aCache.putEverything(BuildConf.CacheKey.SAVE_FEEDBACK_INFO, feedbackInfo, 30 * 24 * 3600);
+    }
+
+    public static FeedbackInfo getFeedbackInfo() {
+        return (FeedbackInfo) aCache.getAsObject(BuildConf.CacheKey.SAVE_FEEDBACK_INFO);
+    }
+
+    public static void removeFeedbackInfo() {
+        aCache.remove(BuildConf.CacheKey.SAVE_FEEDBACK_INFO);
+    }
+
+
+}

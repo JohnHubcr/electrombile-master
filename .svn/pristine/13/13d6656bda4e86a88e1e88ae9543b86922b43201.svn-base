@@ -1,0 +1,74 @@
+package com.zenchn.electrombile.base;
+
+import android.annotation.TargetApi;
+import android.os.Build;
+import android.os.Message;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.kit.ApplicationKit;
+import com.zenchn.mlibrary.base.DefaultFragment;
+import com.zenchn.mlibrary.base.IApplicationKit;
+
+/**
+ * 作    者：wangr on 2017/2/24 14:28
+ * 描    述：fragment基础类
+ * 修订记录：
+ */
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+public abstract class BaseFragment extends DefaultFragment implements BaseView {
+
+    @Override
+    protected IApplicationKit getIApplicationKit() {
+        return ApplicationKit.getInstance();
+    }
+
+    @Override
+    protected void setBaseBeforeInflater() {
+
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.fragment_base;
+    }
+
+    @Override
+    public void getChildView(LayoutInflater inflater, View rootView) {
+        if (isHasTitle() != null) {
+            TextView titleTv = (TextView) rootView.findViewById(R.id.fragment_base_title_tv);
+            titleTv.setText(isHasTitle());
+        } else {
+            RelativeLayout rlTitle = (RelativeLayout) rootView.findViewById(R.id.rl_fragment_base_title);
+            rlTitle.setVisibility(View.GONE);
+        }
+        FrameLayout childContainer = (FrameLayout) rootView.findViewById(R.id.fragment_base_child_container);
+        inflater.inflate(getContentLayoutRes(), childContainer);
+    }
+
+    protected abstract String isHasTitle();
+
+    protected abstract int getContentLayoutRes();
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        initData();
+    }
+
+    @Override
+    protected void handler(Message msg) {
+    }
+
+    protected abstract void initData();
+
+    @Override
+    public void onGrantRefuse() {
+
+    }
+
+}

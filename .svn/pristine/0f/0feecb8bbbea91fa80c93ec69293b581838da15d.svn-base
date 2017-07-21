@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="transparent">#00000000</color>
+    <color name="translucent">#99FFFFFF</color>
+    <color name="translucent_dark">#88000000</color>
+    <color name="maple_base">#99ff4444</color>
+    <color name="green_base">#FF00EE00</color>
+    <color name="blue_base">#0667FE</color>
+    <color name="yellow_base">#ffbb33</color>
+    <color name="red_base">#ff0000</color>
+
+    <color name="tab_menu_bg">#3B3B3D</color>
+    <color name="base_title_bg">#18181A</color>
+
+    <color name="activity_base_bg">#29292F</color>
+    <color name="fragment_base_bg">#29292F</color>
+    <color name="dialog_base_bg">#29292F</color>
+    <color name="toast_base_bg">#29292F</color>
+
+    <color name="button_normal_bg">#333339</color>
+    <color name="button_press_bg">#666666</color>
+    <color name="module_normal_bg">#333339</color>
+    <color name="module_press_bg">#99333339</color>
+
+    <color name="alarm_info_color">#808080</color>
+    <color name="alarm_button_color">#ff2d55</color>
+
+    <!--<color name="button_base_bg">#29292F</color>-->
+
+    <color name="base_text_color_light">#99ff4444</color>
+    <color name="base_text_color_dark">#812F31</color>
+    <color name="base_text_color_grey">#9a9a9a</color>
+    <color name="base_text_color_gray">#cccccc</color>
+    <color name="base_text_color_black">#18181A</color>
+    <color name="base_text_color_blue">#32b4ca</color>
+    <color name="base_text_color_tint_grey">#5a5a5a</color>
+    <color name="ios_text_color_grey">#7D7D7D</color>
+    <color name="ios_text_color_blue">#38ADFF</color>
+    <color name="ios_text_color_blue_dark">#186CFE</color>
+
+    <color name="button_border">#6618181A</color>
+    <color name="button_border_pressed">#18181A</color>
+    <color name="background">#F7F4F0</color>
+
+    <color name="msg_emote_divider">#ffa1a1a1</color>
+    <!-- menudraw -->
+    <color name="md__defaultBackground">#555555</color>
+
+    <!-- A light Holo shade of blue -->
+    <color name="holo_blue_light">#ff33b5e5</color>
+    <!-- A light Holo shade of green -->
+    <color name="holo_green_light">#ff99cc00</color>
+    <!-- A light Holo shade of red -->
+    <color name="holo_red_light">#ffff4444</color>
+    <!-- A dark Holo shade of blue -->
+    <color name="holo_blue_dark">#ff0099cc</color>
+    <!-- A dark Holo shade of green -->
+    <color name="holo_green_dark">#ff669900</color>
+    <!-- A dark Holo shade of red -->
+    <color name="holo_red_dark">#ffcc0000</color>
+    <!-- A Holo shade of purple -->
+    <color name="holo_purple">#ffaa66cc</color>
+    <!-- A light Holo shade of orange -->
+    <color name="holo_orange_light">#ffffbb33</color>
+    <!-- A dark Holo shade of orange -->
+    <color name="holo_orange_dark">#ffff8800</color>
+    <!-- A really bright Holo shade of blue -->
+    <color name="holo_blue_bright">#ff00ddff</color>
+    <color name="white">#ffffff</color>
+    <color name="list_bg">#eeeeee</color>
+    <color name="schedule_week">#32b4ca</color>
+    <color name="pickerview_timebtn_nor">#057dff</color>
+    <color name="pickerview_timebtn_pre">#c2daf5</color>
+    <color name="pickerview_bg_topbar">#f5f5f5</color>
+    <color name="pickerview_topbar_title">#000000</color>
+    <color name="pickerview_wheelview_textcolor_out">#a8a8a8</color>
+    <color name="pickerview_wheelview_textcolor_center">#2a2a2a</color>
+    <color name="pickerview_wheelview_textcolor_divider">#d5d5d5</color>
+
+    <!-- 覆盖颜色 -->
+    <color name="bgColor_overlay">#60000000</color>
+    <color name="stroke_gray">#47474B</color>
+    <color name="home_head_stroke_gray">#47474B</color>
+    <color name="head_stroke_gray">#4E4E52</color>
+    <color name="alpha_ring_bg">#4F3C36</color>
+    <color name="alpha_ring">#fe6407</color>
+    <color name="stroke_tint">#E4E4E4</color>
+    <color name="press_bg">#3B3B3D</color>
+
+    <color name="segment_gray">#47474B</color>
+    <color name="segment_black">#29292F</color>
+
+</resources>

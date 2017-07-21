@@ -1,0 +1,42 @@
+package com.zenchn.electrombile.widget.PickerView.view;
+
+import android.view.View;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.widget.PickerView.lib.WheelView;
+
+/**
+ * 作    者：wangr on 2017/3/10 16:59
+ * 描    述：
+ * 修订记录：
+ */
+public class WheelArea {
+
+    private View view;
+    private WheelView wvProvince;
+    private WheelView wvCity;
+    private WheelView wvDistrict;
+
+    public WheelArea(View view) {
+        super();
+        this.view = view;
+        setView(view);
+    }
+
+    public View getView() {
+        return view;
+    }
+
+    public void setView(View view) {
+        this.view = view;
+    }
+
+    public void setPicker() {
+
+        wvProvince = (WheelView) view.findViewById(R.id.wv_province);
+        wvCity = (WheelView) view.findViewById(R.id.wv_city);
+        wvDistrict = (WheelView) view.findViewById(R.id.wv_district);
+
+    }
+
+}

@@ -1,0 +1,14 @@
+[
+    {
+        "merged": "D:\\zdzc_ddc_temp\\electrombile-master\\lib-StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\raw\\blur.bc",
+        "source": "D:\\zdzc_ddc_temp\\electrombile-master\\lib-StackBlur\\build\\intermediates\\bundles\\debug\\res\\raw\\blur.bc"
+    },
+    {
+        "merged": "D:\\zdzc_as_dds_normal\\Android\\branches\\electrombile-master_branch_zb\\lib-StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\raw\\blur.bc",
+        "source": "D:\\zdzc_as_dds_normal\\Android\\branches\\electrombile-master_branch_zb\\lib-StackBlur\\build\\intermediates\\bundles\\debug\\res\\raw\\blur.bc"
+    },
+    {
+        "merged": "D:\\zdzc_ddc_temp\\electrombile-master_new\\lib-StackBlur\\build\\intermediates\\res\\merged\\androidTest\\debug\\raw\\blur.bc",
+        "source": "D:\\zdzc_ddc_temp\\electrombile-master_new\\lib-StackBlur\\build\\intermediates\\bundles\\debug\\res\\raw\\blur.bc"
+    }
+]

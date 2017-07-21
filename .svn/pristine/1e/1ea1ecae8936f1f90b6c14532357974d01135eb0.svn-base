@@ -1,0 +1,27 @@
+package com.zenchn.electrombile.ui.view;
+
+import com.zenchn.electrombile.base.BaseView;
+import com.zenchn.electrombile.entity.VehicleCheckForJKInfo;
+import com.zenchn.electrombile.entity.VehicleCheckForSTInfo;
+
+/**
+ * 作    者：wangr on 2017/3/13 13:54
+ * 描    述：
+ * 修订记录：
+ */
+public interface VehicleCheckView extends BaseView {
+
+    /**
+     * 获取车辆自检信息成功
+     *
+     * @param vehicleCheckForSTInfo
+     */
+    void onGetVehicleCheckSuccess(VehicleCheckForSTInfo vehicleCheckForSTInfo);
+
+    /**
+     * 获取车辆自检信息成功
+     *
+     * @param vehicleCheckForJKInfo
+     */
+    void onGetVehicleCheckSuccess(VehicleCheckForJKInfo vehicleCheckForJKInfo);
+}

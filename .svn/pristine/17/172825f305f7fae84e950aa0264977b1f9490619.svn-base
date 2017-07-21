@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/fragment_base_bg"
+              android:orientation="vertical">
+
+    <include
+        layout="@layout/include_top_head_return"></include>
+
+    <TextView
+        android:id="@+id/tv_modify_desc"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/common_margin"
+        android:padding="@dimen/common_padding"
+        android:text="@string/modify_account_with_safety_query"
+        android:textColor="@color/translucent"
+        android:textSize="14sp"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/small_margin"
+        android:gravity="center_vertical"
+        android:paddingLeft="@dimen/common_padding">
+
+        <EditText
+            android:id="@+id/et_mobile_phone"
+            style="@style/CommonButtonEditTextViewStyle"
+            android:hint="请输入手机号"
+            android:paddingLeft="@dimen/small_padding"
+            android:textColor="@color/base_text_color_gray"
+            android:textColorHint="@color/base_text_color_gray"></EditText>
+
+        <ImageView
+            android:id="@+id/iv_mobile_phone_clear"
+            style="@style/BaseEditTextClearStyle"
+            android:paddingRight="@dimen/common_padding"
+            android:visibility="invisible"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/common_margin"
+        android:layout_marginRight="@dimen/common_margin">
+
+        <include
+            layout="@layout/include_separate_white_view"></include>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_next"
+        style="@style/GradientButtonStyle"
+        android:layout_marginTop="25dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="发送验证码"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+
+</LinearLayout>

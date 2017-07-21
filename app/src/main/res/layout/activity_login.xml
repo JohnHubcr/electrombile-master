@@ -1,0 +1,190 @@
+<LinearLayout
+    android:id="@+id/ll_main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/iv_logo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:paddingBottom="@dimen/big_padding"
+        android:paddingTop="@dimen/big_padding"
+        android:src="@drawable/name_login"/>
+
+    <LinearLayout
+        android:id="@+id/ll_input_box"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/big_margin"
+        android:paddingBottom="25dp"
+        android:background="@drawable/login_shape"
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingLeft="@dimen/common_padding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="3"
+                android:paddingBottom="@dimen/small_padding"
+                android:paddingTop="@dimen/big_padding"
+                android:text="手机号"
+                android:textColor="@color/base_text_color_tint_grey"
+                android:textSize="16sp"/>
+
+            <EditText
+                android:id="@+id/et_login_name"
+                style="@style/CommonButtonEditTextViewStyle"
+                android:hint="请输入用户名"
+                android:singleLine="true"
+                android:paddingBottom="@dimen/small_padding"
+                android:paddingLeft="@dimen/small_padding"
+                android:paddingTop="@dimen/big_padding"
+                android:textColor="@color/base_text_color_gray"
+                android:textColorHint="@color/base_text_color_gray"/>
+
+            <ImageView
+                android:id="@+id/iv_login_name_close"
+                style="@style/BaseEditTextClearStyle"
+                android:paddingRight="@dimen/common_padding"
+                android:paddingTop="@dimen/big_padding"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/common_margin"
+            android:layout_marginRight="@dimen/common_margin">
+
+            <include
+                layout="@layout/include_separate_white_view"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/common_padding">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="3"
+                android:paddingBottom="@dimen/small_padding"
+                android:paddingTop="@dimen/big_padding"
+                android:text="密    码"
+                android:textColor="@color/base_text_color_tint_grey"
+                android:textSize="16sp"/>
+
+            <EditText
+                android:id="@+id/et_password"
+                style="@style/CommonButtonPswEditTextViewStyle"
+                android:gravity="center_vertical"
+                android:hint="请输入密码"
+                android:paddingBottom="@dimen/small_padding"
+                android:paddingLeft="@dimen/small_padding"
+                android:paddingTop="@dimen/big_padding"
+                android:singleLine="true"
+                android:textColor="@color/base_text_color_gray"
+                android:textColorHint="@color/base_text_color_gray"/>
+
+            <ImageView
+                android:id="@+id/iv_psw_show"
+                style="@style/BaseEditTextPswShowOrHideStyle"
+                android:paddingRight="@dimen/common_padding"
+                android:paddingTop="@dimen/big_padding"
+                android:visibility="invisible"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/common_margin"
+            android:layout_marginRight="@dimen/common_margin">
+
+            <include
+                layout="@layout/include_separate_white_view"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ll_submit"
+        style="@style/GradientButtonStyle"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="登录"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/big_padding">
+
+            <TextView
+                android:id="@+id/tv_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center|top"
+                android:paddingBottom="@dimen/common_padding"
+                android:paddingTop="@dimen/common_padding"
+                android:text="没有神骑出行账号？去注册"
+                android:textColor="@color/white"
+                android:textSize="15sp"/>
+
+            <TextView
+                android:id="@+id/tv_menu"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:gravity="center|top"
+                android:paddingBottom="@dimen/common_padding"
+                android:paddingTop="@dimen/common_padding"
+                android:text="无法登录？"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:visibility="gone"/>
+        </RelativeLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/tv_version"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginBottom="15dp"
+            android:gravity="center_horizontal"
+            android:text="内部版本号"
+            android:textColor="#99ffffff"/>
+    </LinearLayout>
+
+</LinearLayout>

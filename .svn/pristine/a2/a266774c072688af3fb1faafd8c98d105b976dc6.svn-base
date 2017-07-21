@@ -1,0 +1,46 @@
+package com.zenchn.electrombile.api;
+
+import com.zenchn.electrombile.wrapper.OkHttpClientWrapper;
+import com.zenchn.electrombile.wrapper.callback.ProgressRequestCallback;
+import com.zenchn.electrombile.wrapper.callback.ProgressResponseCallback;
+
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+
+/**
+ * 作    者：wangr on 2017/3/15 17:23
+ * 描    述：
+ * 修订记录：
+ */
+public class DownloadApi {
+
+    /**
+     * 创建带响应进度(下载进度)回调的service
+     *
+     * @param baseUrl
+     * @param callback
+     * @return
+     */
+    public static Retrofit createResponseService(String baseUrl, ProgressResponseCallback callback) {
+        return new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(OkHttpClientWrapper.addProgressResponseCallback(callback))
+                .build();
+    }
+
+    /**
+     * 创建带响应进度(下载进度)回调的service
+     *
+     * @param baseUrl
+     * @param callback
+     * @return
+     */
+    public static Retrofit createResponseService(String baseUrl, ProgressRequestCallback callback) {
+        return new Retrofit.Builder()
+                .baseUrl(baseUrl)
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .client(OkHttpClientWrapper.addProgressRequestCallback(callback))
+                .build();
+    }
+}

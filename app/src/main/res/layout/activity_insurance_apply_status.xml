@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:gravity="center_horizontal"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head_back"/>
+
+    <ImageView
+        android:id="@+id/iv_result"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="50dp"
+        android:src="@drawable/error"/>
+
+    <TextView
+        android:id="@+id/tv_result"
+        style="@style/BaseTextViewStyle"
+        android:layout_marginTop="@dimen/big_margin"
+        android:text="审核未通过"/>
+
+    <TextView
+        android:id="@+id/tv_content"
+        style="@style/BaseTextViewStyle"
+        android:layout_marginTop="@dimen/big_margin"
+        android:text="未通过原因:身份证照片正面模糊"/>
+
+    <LinearLayout
+        android:id="@+id/ll_submit"
+        style="@style/GradientButtonStyle"
+        android:layout_marginTop="25dp"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="重新激活"
+            android:textColor="@color/white"
+            android:textSize="16sp"/>
+    </LinearLayout>
+
+    <TextView
+        android:padding="@dimen/little_padding"
+        android:id="@+id/tv_insurance_improve"
+        android:layout_width="match_parent"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="先去完善理赔信息"
+        android:textColor="#5998e4"
+        android:textSize="16sp"/>
+
+</LinearLayout>

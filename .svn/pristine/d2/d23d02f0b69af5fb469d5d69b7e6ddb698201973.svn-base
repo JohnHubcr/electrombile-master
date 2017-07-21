@@ -1,0 +1,317 @@
+package com.zenchn.electrombile.api;
+
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.baidu.location.BDLocation;
+import com.baidu.mapapi.model.LatLng;
+import com.zenchn.electrombile.Constants;
+import com.zenchn.electrombile.api.callback.ApiListCallback;
+import com.zenchn.electrombile.base.BaseApi;
+import com.zenchn.electrombile.entity.AlarmMessageInfo;
+import com.zenchn.electrombile.entity.ChargingStationInfo;
+import com.zenchn.electrombile.entity.RepairStationInfo;
+import com.zenchn.electrombile.kit.LogKit;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
+/**
+ * 作    者：wangr on 2017/3/2 17:41
+ * 描    述： 获取列表数据的api
+ * 修订记录：
+ */
+public class ListApi extends BaseApi {
+
+    private ListApi() {
+    }
+
+    public static ListApi getInstance() {
+        return new ListApi();
+    }
+
+    /**
+     * 获取报警消息
+     *
+     * @param accessToken
+     * @param serialNumber
+     * @param pageNo
+     * @param pageSize
+     * @param msgType
+     */
+    public void getAlarmMessageList(String accessToken, String serialNumber, final int pageNo, int pageSize, String msgType, final ApiListCallback<List<AlarmMessageInfo>> callback) {
+
+        mApiStore
+                .getAlarmMessageList(accessToken, serialNumber, String.valueOf(pageNo), String.valueOf(pageSize), msgType)
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        try {
+
+                            if (response.code() == 200) {
+
+                                JSONObject data = JSON.parseObject(response.body()).getJSONObject("data");
+                                JSONArray list = data.getJSONArray("list");
+
+                                List<AlarmMessageInfo> mData = null;
+                                int totalPages = 0;
+
+                                if (list != null && !list.isEmpty()) {
+                                    mData = new ArrayList<>();
+                                    AlarmMessageInfo alarmMessageInfo = null;
+                                    int size = list.size();
+
+                                    for (int i = 0; i < size; i++) {
+                                        JSONObject obj = list.getJSONObject(i);
+                                        alarmMessageInfo = new AlarmMessageInfo();
+
+                                        alarmMessageInfo.setMsgTitle(obj.getString("title"));
+                                        alarmMessageInfo.setMsgContent(obj.getString("content"));
+                                        alarmMessageInfo.setMsgType(obj.getString("type"));
+                                        alarmMessageInfo.setVehicleAddress(obj.getString("brokeAddress"));
+
+                                        String[] lngAndLat = obj.getString("latAndlng").split(",");
+                                        alarmMessageInfo.setVehicleLatLng(new LatLng(Double.valueOf(lngAndLat[1]), Double.valueOf(lngAndLat[0])));
+
+                                        alarmMessageInfo.setMsgDate(obj.getLongValue("brokeDate"));
+
+                                        mData.add(alarmMessageInfo);
+                                    }
+                                    totalPages = data.getIntValue("totalPages");
+                                }
+
+                                LogKit.success("报警列表信息获取成功", "定位信息：\n" + (mData != null ? mData.toString() : "列表为空!"));
+                                callback.onSuccess(mData, pageNo, totalPages);
+
+                            } else if (response.code() == 401) {
+
+                                callback.onGrantRefuse();
+                                LogKit.success("报警列表信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                            } else {
+                                JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                LogKit.success("报警列表信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                callback.onFailure();
+                            }
+
+                        } catch (Exception e) {
+                            callback.onFailure();
+                            LogKit.exception("报警列表信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        callback.onFailure();
+                        LogKit.exception("报警列表信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                    }
+                });
+    }
+
+    /**
+     * 获取售后服务
+     *
+     * @param accessToken
+     * @param bdLocation
+     * @param pageNo
+     * @param pageSize
+     * @param serviceType
+     */
+    public void getChargeServiceStationList(String accessToken, BDLocation bdLocation, int pageNo, int pageSize, int serviceType, ApiListCallback<List<ChargingStationInfo>> callback) {
+        if (Constants.ServiceType.charge == serviceType) {
+            getChargeServiceStationList(accessToken, bdLocation.getCity(), bdLocation.getDistrict(), bdLocation.getAddress().address, pageNo, pageSize, serviceType, callback);
+        } else
+            callback.onFailure();
+    }
+
+    /**
+     * 获取充电网点
+     *
+     * @param accessToken
+     * @param city
+     * @param district
+     * @param address
+     * @param pageNo
+     * @param pageSize
+     * @param serviceType
+     * @param callback
+     */
+    private void getChargeServiceStationList(String accessToken, String city, String district, String address, final int pageNo, int pageSize, int serviceType, final ApiListCallback<List<ChargingStationInfo>> callback) {
+        mApiStore
+                .getServiceStationList(accessToken, city, district, address, String.valueOf(pageNo), String.valueOf(pageSize), String.valueOf(serviceType))
+                .enqueue(new Callback<String>() {
+                             @Override
+                             public void onResponse(Call<String> call, Response<String> response) {
+                                 try {
+
+                                     if (response.code() == 200) {
+
+                                         JSONObject data = JSON.parseObject(response.body()).getJSONObject("data");
+                                         JSONArray list = data.getJSONArray("list");
+
+                                         List<ChargingStationInfo> mData = null;
+                                         int totalPages = 0;
+
+                                         if (list != null && !list.isEmpty()) {
+
+                                             mData = new ArrayList<>();
+                                             ChargingStationInfo chargingStationInfo = null;
+
+                                             int size = list.size();
+                                             for (int i = 0; i < size; i++) {
+                                                 JSONObject obj = list.getJSONObject(i);
+                                                 chargingStationInfo = new ChargingStationInfo();
+                                                 chargingStationInfo.setProvince(obj.getString("province"));
+                                                 chargingStationInfo.setCity(obj.getString("city"));
+                                                 chargingStationInfo.setDistrict(obj.getString("district"));
+                                                 chargingStationInfo.setAddress(obj.getString("address"));
+
+                                                 chargingStationInfo.setArea(obj.getString("area"));
+                                                 chargingStationInfo.setName(obj.getString("name"));
+                                                 chargingStationInfo.setPhone(obj.getString("province"));
+
+                                                 chargingStationInfo.setLatLng(new LatLng(obj.getDoubleValue("lat"), obj.getDoubleValue("lng")));
+                                                 chargingStationInfo.setDesc(obj.getString("descriptor"));
+                                                 chargingStationInfo.setImg(obj.getString("img"));
+
+                                                 mData.add(chargingStationInfo);
+                                             }
+
+                                             totalPages = data.getIntValue("totalPages");
+                                         }
+                                         LogKit.success("充电服务站点列表信息获取成功", "列表信息：\n" + (mData != null ? mData.toString() : "列表消息为空！"));
+                                         callback.onSuccess(mData, pageNo, totalPages);
+                                     } else if (response.code() == 401) {
+
+                                         callback.onGrantRefuse();
+                                         LogKit.success("服务站点列表信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                                     } else {
+                                         JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                         LogKit.success("服务站点列表信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                         callback.onFailure();
+                                     }
+
+                                 } catch (Exception e) {
+                                     callback.onFailure();
+                                     LogKit.exception("服务站点列表信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                                 }
+                             }
+
+                             @Override
+                             public void onFailure(Call<String> call, Throwable t) {
+                                 callback.onFailure();
+                                 LogKit.exception("服务站点列表信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                             }
+                         }
+
+                );
+
+    }
+
+    /**
+     * 获取维修网点
+     *
+     * @param accessToken
+     * @param bdLocation
+     * @param pageNo
+     * @param pageSize
+     * @param serviceType
+     * @param callback
+     */
+    public void getRepairServiceStationList(String accessToken, BDLocation bdLocation, int pageNo, int pageSize, int serviceType, ApiListCallback<List<RepairStationInfo>> callback) {
+        if (Constants.ServiceType.repair == serviceType)
+            getRepairServiceStationList(accessToken, bdLocation.getCity(), bdLocation.getDistrict(), bdLocation.getAddress().address, pageNo, pageSize, serviceType, callback);
+        else
+            callback.onFailure();
+    }
+
+    /**
+     * 获取维修网点
+     *
+     * @param accessToken
+     * @param city
+     * @param district
+     * @param address
+     * @param pageNo
+     * @param pageSize
+     * @param serviceType
+     * @param callback
+     */
+    private void getRepairServiceStationList(String accessToken, String city, String district, String address, final int pageNo, int pageSize, int serviceType, final ApiListCallback<List<RepairStationInfo>> callback) {
+        mApiStore
+                .getServiceStationList(accessToken, city, district, address, String.valueOf(pageNo), String.valueOf(pageSize), String.valueOf(serviceType))
+                .enqueue(new Callback<String>() {
+                             @Override
+                             public void onResponse(Call<String> call, Response<String> response) {
+                                 try {
+
+                                     if (response.code() == 200) {
+
+                                         JSONObject data = JSON.parseObject(response.body()).getJSONObject("data");
+                                         JSONArray list = data.getJSONArray("list");
+
+                                         List<RepairStationInfo> mData = null;
+                                         int totalPages = 0;
+
+                                         if (list != null && !list.isEmpty()) {
+
+                                             mData = new ArrayList<>();
+                                             RepairStationInfo repairStationInfo = null;
+
+                                             int size = list.size();
+                                             for (int i = 0; i < size; i++) {
+                                                 JSONObject obj = list.getJSONObject(i);
+                                                 repairStationInfo = new RepairStationInfo();
+                                                 repairStationInfo.setProvince(obj.getString("province"));
+                                                 repairStationInfo.setCity(obj.getString("city"));
+                                                 repairStationInfo.setDistrict(obj.getString("district"));
+                                                 repairStationInfo.setAddress(obj.getString("address"));
+
+                                                 repairStationInfo.setArea(obj.getString("area"));
+                                                 repairStationInfo.setName(obj.getString("name"));
+                                                 repairStationInfo.setPhone(obj.getString("province"));
+
+                                                 repairStationInfo.setLatLng(new LatLng(obj.getDoubleValue("lat"), obj.getDoubleValue("lng")));
+                                                 repairStationInfo.setDesc(obj.getString("descriptor"));
+                                                 repairStationInfo.setImg(obj.getString("img"));
+
+                                                 mData.add(repairStationInfo);
+                                             }
+
+                                             totalPages = data.getIntValue("totalPages");
+                                         }
+                                         LogKit.success("维修站点列表信息获取成功", "列表信息：\n" + (mData != null ? mData.toString() : "列表为空！"));
+                                         callback.onSuccess(mData, pageNo, totalPages);
+                                     } else if (response.code() == 401) {
+
+                                         callback.onGrantRefuse();
+                                         LogKit.success("维修站点列表信息获取失败", "失败原因：\n" + JSON.parseObject(response.errorBody().string()).getString("error"));
+
+                                     } else {
+                                         JSONObject errorResult = JSON.parseObject(response.errorBody().string());
+                                         LogKit.success("维修站点列表信息获取失败", "失败原因：\n" + errorResult.getString("error"));
+                                         callback.onFailure();
+                                     }
+
+                                 } catch (Exception e) {
+                                     callback.onFailure();
+                                     LogKit.exception("维修站点列表信息获取失败", "解析错误，异常信息：\n" + e.toString());
+                                 }
+                             }
+
+                             @Override
+                             public void onFailure(Call<String> call, Throwable t) {
+                                 callback.onFailure();
+                                 LogKit.exception("维修站点列表信息获取失败", "访问失败, 异常信息：\n" + t.toString());
+                             }
+                         }
+
+                );
+
+    }
+}

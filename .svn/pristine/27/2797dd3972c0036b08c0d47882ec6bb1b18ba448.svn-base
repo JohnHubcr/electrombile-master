@@ -1,0 +1,181 @@
+package com.zenchn.electrombile.utils;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.net.Uri;
+
+import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.utils.DistanceUtil;
+import com.zenchn.electrombile.BuildConf;
+import com.zenchn.electrombile.ui.activity.WebViewCommonActivity;
+import com.zenchn.mlibrary.utils.ApkUtils;
+
+import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.List;
+
+public class MapAppUtils {
+
+    // 显示名称
+    public static final String BAIDU_MAP_NAME = "百度地图-App导航";
+    public static final String GAODE_MAP_NAME = "高德地图-App导航";
+    public static final String BROWSER_DOWNLOAD = "未检测到地图应用-立即下载";
+
+    // URL地址
+    public static final String BAIDU_STORE_URL = "http://mobile.baidu.com/item/appsearch?pid=825114773";
+    public static final String DOWN_LOAD_URL = "http://market.91.com/Android/1/Search/地图";
+
+    // 距离判断
+    public static final int WALKING_FIRST = 3000;
+    public static final int TRANSIT_FIRST = 5000;
+
+    // 百度地图导航类型
+    public static final String BD_WALKING_MODE = "walking";
+    public static final String BD_DRIVING_MODE = "driving";
+    public static final String BD_TRANSIT_MODE = "transit";
+
+    // 高德地图导航类型
+    public static final String GD_WALKING_MODE = "4";
+    public static final String GD_DRIVING_MODE = "2";
+    public static final String GD_TRANSIT_MODE = "1";
+
+    // 腾讯地图导航了类型
+    private static final String TX_WALKING_MODE = "walk";
+    private static final String TX_TRANSIT_MODE = "bus";
+    private static final String TX_DRIVING_MODE = "drive";
+
+
+    /**
+     * 打开百度地图导航
+     *
+     * @param context
+     * @param sLatLng
+     * @param eLatLng
+     */
+    public static void openBaiDuMap(Context context, LatLng sLatLng, LatLng eLatLng) {
+
+        if (ApkUtils.isAvailable(context, BuildConf.AppPackage.GAODE_MAP)) {
+            try {
+                String mode;
+                double distance = DistanceUtil.getDistance(sLatLng, eLatLng);
+                if (distance < WALKING_FIRST) {
+                    mode = BD_WALKING_MODE;
+                } else if (distance < TRANSIT_FIRST) {
+                    mode = BD_TRANSIT_MODE;
+                } else {
+                    mode = BD_DRIVING_MODE;
+                }
+                Intent intent = Intent.parseUri("intent://map/direction?origin=latlng:" + sLatLng.latitude + ","
+                                + sLatLng.longitude + "|name:我的位置&destination=latlng:" + eLatLng.latitude + ","
+                                + eLatLng.longitude + "|name:车的位置&mode=" + mode
+                                + "&src=thirdapp.navi.zenchn.electrombile#Intent;scheme=bdapp;package=com.baidu.BaiduMap;end",
+                        0);
+
+                context.startActivity(intent); // 启动调用
+
+            } catch (URISyntaxException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 打开高德地图导航
+     *
+     * @param context
+     * @param sLatLng
+     * @param eLatLng
+     */
+    public static void openGaoDeMap(Context context, LatLng sLatLng, LatLng eLatLng) {
+        if (ApkUtils.isAvailable(context, BuildConf.AppPackage.GAODE_MAP)) {
+            String mode;
+            double distance = DistanceUtil.getDistance(sLatLng, eLatLng);
+            if (distance < WALKING_FIRST) {
+                mode = GD_WALKING_MODE;
+            } else if (distance < TRANSIT_FIRST) {
+                mode = GD_TRANSIT_MODE;
+            } else {
+                mode = GD_DRIVING_MODE;
+            }
+
+            Intent intent = new Intent("android.intent.action.VIEW",
+                    Uri.parse("androidamap://route?sourceApplication=平安出行&slat=" + sLatLng.latitude
+                            + "&slon=" + sLatLng.longitude + "&sname=我的位置&dlat=" + eLatLng.latitude + "&dlon="
+                            + eLatLng.longitude + "&dname=车的位置&dev=0&m=0&t=" + mode));
+
+            intent.setPackage(BuildConf.AppPackage.GAODE_MAP);
+            context.startActivity(intent); // 启动调用
+        }
+    }
+
+    /**
+     * 打开腾讯地图导航
+     *
+     * @param context
+     * @param sLatLng
+     * @param eLatLng
+     */
+    public static void openTencentMap(Context context, LatLng sLatLng, LatLng eLatLng, String endPoint) {
+        String mode;
+        double distance = DistanceUtil.getDistance(sLatLng, eLatLng);
+        if (distance < WALKING_FIRST) {
+            mode = TX_WALKING_MODE;
+        } else if (distance < TRANSIT_FIRST) {
+            mode = TX_TRANSIT_MODE;
+        } else {
+            mode = TX_DRIVING_MODE;
+        }
+        String targetUrl = "http://apis.map.qq.com/uri/v1/routeplan?type=" + mode + "&from=我的位置&fromcoord="
+                + sLatLng.latitude + "," + sLatLng.longitude + "&to=" + endPoint + "&tocoord=" + eLatLng.latitude + ","
+                + eLatLng.longitude + "&coord_type=1&policy=0&referer=平安出行";
+        Intent intent = new Intent();
+        intent.putExtra("type", BuildConf.WebViewType.USER_DEFINED_WEB);
+        intent.putExtra("url", targetUrl);
+        intent.setClass(context, WebViewCommonActivity.class);
+        context.startActivity(intent);
+    }
+
+    /**
+     * 检测本机安装的地图App
+     *
+     * @param context
+     * @return
+     */
+    public static List<String> checkLocalMapApp(Context context) {
+        ArrayList<String> apps = new ArrayList<>();
+        if (ApkUtils.isAvailable(context, BuildConf.AppPackage.BAIDU_MAP))
+            apps.add(BAIDU_MAP_NAME);
+        if (ApkUtils.isAvailable(context, BuildConf.AppPackage.GAODE_MAP))
+            apps.add(GAODE_MAP_NAME);
+        return apps;
+    }
+
+    /**
+     * 在webView中显示应用市场
+     *
+     * @param activity
+     */
+    public static void downMap(Activity activity) {
+        Intent intent = new Intent();
+        intent.putExtra("type", BuildConf.WebViewType.USER_DEFINED_WEB);
+        intent.putExtra("url", BAIDU_STORE_URL);
+        intent.setClass(activity, WebViewCommonActivity.class);
+        activity.startActivity(intent);
+    }
+
+    /**
+     * 跳转到浏览器下载
+     *
+     * @param activity
+     * @param url
+     */
+    public static void openBrowser(Activity activity, String url) {
+        Intent intent = new Intent();
+        intent.setAction("android.intent.action.VIEW");
+        Uri content_url = Uri.parse(url);
+        intent.setData(content_url);
+        activity.startActivity(intent);
+    }
+
+}

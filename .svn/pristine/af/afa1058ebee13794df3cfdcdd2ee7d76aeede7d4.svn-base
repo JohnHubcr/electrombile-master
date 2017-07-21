@@ -1,0 +1,62 @@
+package com.zenchn.electrombile.widget.RecyclerView.wrapper;
+
+import android.os.Handler;
+import android.os.Looper;
+import android.support.v7.widget.RecyclerView;
+import android.view.ViewGroup;
+
+/**
+ * 作    者：wangr on 2017/3/13 16:15
+ * 描    述：
+ * 修订记录：
+ */
+public class ScanWrapperAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+
+    private IScanWrapperAdapter mScanWrapperAdapter;
+    private Handler mHandler;
+
+    private int circlePosition;
+
+    public ScanWrapperAdapter(IScanWrapperAdapter mScanWrapperAdapter) {
+        this.mScanWrapperAdapter = mScanWrapperAdapter;
+        this.mHandler = new Handler(Looper.getMainLooper());
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return mScanWrapperAdapter.getItemViewType(position);
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        return  mScanWrapperAdapter.onCreateViewHolder(parent, viewType);
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        if (position == circlePosition) {
+            mScanWrapperAdapter.onBindViewHolderByItemCircleScan(holder, position);
+        } else if (position > circlePosition) {
+            mScanWrapperAdapter.onBindViewHolderByItemHide(holder, position);
+        }
+        mScanWrapperAdapter.onBindViewHolder(holder, position);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                circlePosition++;
+                mScanWrapperAdapter.notifyDataSetChanged();
+                if (circlePosition < getItemCount() - 1)
+                    mHandler.postDelayed(this, 1000);
+            }
+        }, 1000);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mScanWrapperAdapter.getItemCount();
+    }
+}

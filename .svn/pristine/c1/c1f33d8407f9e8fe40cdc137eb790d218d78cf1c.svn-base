@@ -1,0 +1,211 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:background="@color/activity_base_bg"
+              android:orientation="vertical">
+
+    <include
+        android:id="@+id/in_head"
+        layout="@layout/include_top_head"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:paddingBottom="@dimen/little_padding"
+        android:paddingTop="@dimen/big_padding">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="@dimen/little_margin"
+            android:src="@drawable/ensure_big"/>
+
+        <TextView
+            style="@style/BaseTextButtonStyle"
+            android:layout_marginTop="@dimen/big_margin"
+            android:text="@string/insurance_protect_desc_top"
+            android:textColor="@color/white"
+            android:textSize="22sp"/>
+
+        <TextView
+            android:id="@+id/tv_insurance_remark"
+            style="@style/BaseTextButtonStyle"
+            android:layout_marginTop="@dimen/little_margin"
+            android:text="@string/insurance_protect_desc_mid"
+            android:textSize="14sp"/>
+
+        <TextView
+            android:id="@+id/tv_insurance_time_limit"
+            style="@style/BaseTextButtonStyle"
+            android:layout_marginTop="@dimen/big_margin"
+            android:text="@string/insurance_protect_desc_below"
+            android:textSize="12sp"/>
+
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                style="@style/CommonButtonStyle"
+                android:layout_height="55dp"
+                android:layout_marginTop="@dimen/common_padding"
+                android:gravity="center_vertical">
+
+                <TextView
+                    style="@style/BaseTextViewStyle"
+                    android:text="险种"
+                    android:textColor="@color/white"/>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="right|center_vertical"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_insurance_content"
+                        style="@style/BaseTextButtonStyle"
+                        android:textColor="@color/white"
+                        android:textSize="16sp"/>
+
+                    <TextView
+                        android:id="@+id/tv_insurance_provider"
+                        style="@style/BaseTextButtonStyle"
+                        android:textSize="10sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"></include>
+
+            <LinearLayout
+                android:id="@+id/ll_insurance_cover"
+                style="@style/CommonButtonStyle">
+
+                <TextView
+                    style="@style/CommonButtonLeftTextViewStyle"
+                    android:text="服务条款"
+                    android:textSize="15sp"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/next"/>
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"></include>
+
+
+            <LinearLayout
+                android:id="@+id/ll_insurance_improve"
+                style="@style/CommonButtonStyle">
+
+                <TextView
+                    style="@style/CommonButtonLeftTextViewStyle"
+                    android:text="理赔信息"/>
+
+                <RelativeLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="@dimen/common_margin"
+                    android:layout_weight="1"
+                    android:paddingRight="@dimen/little_padding">
+
+                    <TextView
+                        android:id="@+id/tv_improve_progress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_toLeftOf="@+id/iv_improve_point"
+                        android:text="请填写"
+                        android:textColor="@color/translucent"
+                        android:textSize="12sp"/>
+
+                    <ImageView
+                        android:id="@+id/iv_improve_point"
+                        android:layout_width="5dp"
+                        android:layout_height="5dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentTop="true"
+                        android:layout_marginLeft="@dimen/small_margin"
+                        android:src="@drawable/small_red_dot"/>
+                </RelativeLayout>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/next"/>
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"></include>
+
+            <LinearLayout
+                android:id="@+id/ll_claim_flowsheet"
+                style="@style/CommonButtonStyle"
+                android:visibility="gone">
+
+                <TextView
+                    style="@style/CommonButtonLeftTextViewStyle"
+                    android:text="理赔流程"/>
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/next"/>
+            </LinearLayout>
+
+            <include
+                layout="@layout/include_separate_transparent_view"></include>
+
+            <LinearLayout
+                style="@style/CommonButtonStyle">
+
+                <TextView
+                    style="@style/CommonButtonLeftTextViewStyle"
+                    android:text="理赔热线"/>
+
+                <TextView
+                    android:id="@+id/tv_service_call"
+                    style="@style/CommonButtonRightTextViewStyle"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical|right"
+                    android:paddingRight="@dimen/little_padding"/>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/ll_claim"
+                style="@style/GradientButtonStyle"
+                android:layout_marginTop="20dp"
+                android:gravity="center">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="申请理赔"
+                    android:textColor="@color/white"
+                    android:textSize="16sp"/>
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,72 @@
+package com.zenchn.electrombile.ui.activity;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.ScrollView;
+import android.widget.TextView;
+
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.base.BaseActivity;
+import com.zenchn.electrombile.utils.EqumodelUtils;
+
+import butterknife.BindView;
+
+/**
+ * 作    者：wangr on 2017/2/24 15:17
+ * 描    述：
+ * 修订记录：
+ */
+public class VehicleCheckActivity extends BaseActivity {
+
+    @BindView(R.id.tv_title)
+    TextView tvTitle;
+    @BindView(R.id.tv_motor_grade)
+    TextView tvMotorGrade;
+    @BindView(R.id.tv_motor_desc)
+    TextView tvMotorDesc;
+    @BindView(R.id.tv_suggest_desc)
+    TextView tvSuggestDesc;
+    @BindView(R.id.tv_ll_motor_check)
+    TextView tvLlMotorCheck;
+    @BindView(R.id.gv_subject)
+    GridView gvSubject;
+    @BindView(R.id.iv_meterTrouble)
+    ImageView ivMeterTrouble;
+    @BindView(R.id.iv_bmsTrouble)
+    ImageView ivBmsTrouble;
+    @BindView(R.id.sv_subject)
+    ScrollView svSubject;
+
+    private boolean equModelForST;
+
+    @Override
+    protected void initContentView(Bundle savedInstanceState) {
+
+    }
+
+    @Override
+    protected void initData() {
+        tvTitle.setText(getString(R.string.title_vehicle_check));
+        equModelForST = EqumodelUtils.isEqumodelForST(loginInfo.getEquModel());
+        if (equModelForST) {
+            svSubject.setVisibility(View.VISIBLE);
+            gvSubject.setVisibility(View.GONE);
+        } else {
+            svSubject.setVisibility(View.GONE);
+            gvSubject.setVisibility(View.VISIBLE);
+        }
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_check;
+    }
+
+    @Override
+    public boolean useUiHandler() {
+        return true;
+    }
+
+}

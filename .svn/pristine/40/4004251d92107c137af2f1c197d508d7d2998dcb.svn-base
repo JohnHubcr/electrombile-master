@@ -1,0 +1,90 @@
+package com.zenchn.electrombile.presenter.impl;
+
+import com.zenchn.electrombile.api.InsuranceApi;
+import com.zenchn.electrombile.api.callback.ApiCallback;
+import com.zenchn.electrombile.api.callback.SubmitCallback;
+import com.zenchn.electrombile.entity.InsuranceClaimInfo;
+import com.zenchn.electrombile.presenter.InsuranceClaimPresenter;
+import com.zenchn.electrombile.ui.view.InsuranceClaimView;
+
+import java.io.File;
+import java.util.LinkedHashMap;
+
+/**
+ * 作    者：wangr on 2017/3/8 14:53
+ * 描    述：
+ * 修订记录：
+ */
+public class InsuranceClaimPresenterImpl implements InsuranceClaimPresenter, ApiCallback<InsuranceClaimInfo>, SubmitCallback {
+
+    private InsuranceClaimView insuranceClaimView;
+
+    public InsuranceClaimPresenterImpl(InsuranceClaimView insuranceClaimView) {
+        this.insuranceClaimView = insuranceClaimView;
+    }
+
+    @Override
+    public void onDestroy() {
+        insuranceClaimView = null;
+    }
+
+    @Override
+    public void submitInsuranceClaimInfo(String accessToken, String serialNumber, InsuranceClaimInfo insuranceClaimInfo, LinkedHashMap<String, File> fileParams) {
+        if (insuranceClaimView != null) {
+            insuranceClaimView.showProgress();
+            InsuranceApi
+                    .getInstance()
+                    .submitInsuranceClaim(accessToken, serialNumber, insuranceClaimInfo, fileParams, this);
+        }
+    }
+
+    @Override
+    public void getUserClaims(String accessToken, String serialNumber) {
+        if (insuranceClaimView != null) {
+            insuranceClaimView.showProgress();
+            InsuranceApi
+                    .getInstance()
+                    .getUserClaims(accessToken, serialNumber, this);
+        }
+    }
+
+    @Override
+    public void onSuccess(InsuranceClaimInfo insuranceClaimInfo) {
+        if (insuranceClaimView != null) {
+            insuranceClaimView.hideProgress();
+            insuranceClaimView.renewInsuranceClaimInfo(insuranceClaimInfo, true);
+        }
+    }
+
+    @Override
+    public void onSuccess(boolean result) {
+        if (insuranceClaimView != null) {
+            insuranceClaimView.hideProgress();
+            insuranceClaimView.onSubmitCompleted(result);
+        }
+    }
+
+    @Override
+    public void onResponseError(String err_msg) {
+        if (insuranceClaimView != null) {
+            insuranceClaimView.hideProgress();
+            insuranceClaimView.onResponseError(err_msg);
+        }
+    }
+
+    @Override
+    public void onFailure() {
+        if (insuranceClaimView != null) {
+            insuranceClaimView.hideProgress();
+            insuranceClaimView.onFailure();
+        }
+    }
+
+    @Override
+    public void onGrantRefuse() {
+        if (insuranceClaimView != null) {
+            insuranceClaimView.hideProgress();
+            insuranceClaimView.onGrantRefuse();
+        }
+    }
+}

@@ -1,0 +1,393 @@
+package com.zenchn.electrombile.ui.fragment;
+
+
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.Message;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
+import com.zenchn.electrombile.R;
+import com.zenchn.electrombile.adapter.MenuAdapter;
+import com.zenchn.electrombile.app.Constants;
+import com.zenchn.electrombile.base.BaseHomePageFragment;
+import com.zenchn.electrombile.adapter.bean.MenuInfo;
+import com.zenchn.electrombile.entity.VehicleContrailInfo;
+import com.zenchn.electrombile.entity.VehicleLocationInfo;
+import com.zenchn.electrombile.entity.WeatherInfo;
+import com.zenchn.electrombile.entity.model.TcpCmdEnum;
+import com.zenchn.electrombile.eventBus.GeoCodeEvent;
+import com.zenchn.electrombile.eventBus.UpdateDataEvent;
+import com.zenchn.electrombile.eventBus.VehicleContrailEvent;
+import com.zenchn.electrombile.eventBus.VehicleLocationEvent;
+import com.zenchn.electrombile.eventBus.WeatherEvent;
+import com.zenchn.electrombile.kit.LogKit;
+import com.zenchn.electrombile.ui.activity.ChargingOutletsActivity;
+import com.zenchn.electrombile.ui.activity.RepairOutletsActivity;
+import com.zenchn.electrombile.ui.activity.VehicleCheckActivity;
+import com.zenchn.electrombile.ui.activity.VehicleContrailActivity;
+import com.zenchn.electrombile.ui.activity.VehicleControlActivity;
+import com.zenchn.electrombile.ui.activity.VehicleSpeedLimitActivity;
+import com.zenchn.electrombile.ui.activity.VehicleTrackingActivity;
+import com.zenchn.electrombile.widget.CircleProgressBar;
+import com.zenchn.electrombile.widget.Dialog.CommonDialogFactory;
+import com.zenchn.electrombile.wrapper.ACacheWrapper;
+import com.zenchn.electrombile.wrapper.TcpCmdWrapper;
+import com.zenchn.mlibrary.utils.DateUtils;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import butterknife.BindView;
+import butterknife.OnClick;
+import cn.bingoogolapple.refreshlayout.BGANormalRefreshViewHolder;
+import cn.bingoogolapple.refreshlayout.BGARefreshLayout;
+
+/**
+ * 作    者：wangr on 2017/2/24 15:08
+ * 描    述：
+ * 修订记录：
+ */
+public class HomeFragment extends BaseHomePageFragment implements AdapterView.OnItemClickListener, BGARefreshLayout.BGARefreshLayoutDelegate {
+
+    private final static String[] TITLES = new String[]{
+            "声光寻车", "车辆控制",
+            "车速限制", "充电网点",
+            "车身体检", "维修网点"};
+
+    private final static int[] ICONS = new int[]{
+            R.drawable.acousto_optic,
+            R.drawable.control,
+            R.drawable.speed,
+            R.drawable.charge,
+            R.drawable.physical,
+            R.drawable.maintain};
+
+    @BindView(R.id.iv_weather)
+    ImageView ivWeather;
+    @BindView(R.id.tv_city)
+    TextView tvCity;
+    @BindView(R.id.tv_temperature)
+    TextView tvTemperature;
+    @BindView(R.id.tv_pm25)
+    TextView tvPm25;
+    @BindView(R.id.circleProgressBarLeft)
+    CircleProgressBar circleProgressBarLeft;
+    @BindView(R.id.tv_protect_days)
+    TextView tvProtectDays;
+    @BindView(R.id.circleProgressBarRight)
+    CircleProgressBar circleProgressBarRight;
+    @BindView(R.id.bl_refresh)
+    BGARefreshLayout blRefresh;
+    @BindView(R.id.tv_motor_p_status)
+    TextView tvMotorPStatus;
+    @BindView(R.id.tv_motor_location)
+    TextView tvMotorLocation;
+    @BindView(R.id.tv_motor_total_mileage)
+    TextView tvMotorTotalMileage;
+    @BindView(R.id.tv_motor_total_mileage_unit)
+    TextView tvMotorTotalMileageUnit;
+    @BindView(R.id.tv_motor_total_hours)
+    TextView tvMotorTotalHours;
+    @BindView(R.id.gv_main)
+    GridView gvMain;
+
+    @Subscribe(sticky = true)
+    public void onEventMainThread(VehicleLocationEvent event) {
+        VehicleLocationInfo vehicleLocationInfo = event.getVehicleLocationInfo();
+        showVehicleInfo(vehicleLocationInfo);
+
+    }
+
+    @Subscribe(sticky = true)
+    public void onEventMainThread(GeoCodeEvent event) {
+        ReverseGeoCodeResult reverseGeoCodeResult = event.getReverseGeoCodeResult();
+        showVehicleAddress(reverseGeoCodeResult);
+    }
+
+    @Subscribe
+    public void onEventMainThread(WeatherEvent event) {
+        WeatherInfo weatherInfo = event.getWeatherInfo();
+        showWeatherInfo(weatherInfo);
+    }
+
+    @Subscribe(sticky = true)
+    public void onEventMainThread(VehicleContrailEvent event) {
+        VehicleContrailInfo vehicleContrailInfo = event.getVehicleContrailInfo();
+        showVehicleLastContrail(vehicleContrailInfo);
+    }
+
+    @Override
+    public boolean useUiHandler() {
+        return true;
+    }
+
+    @Override
+    protected String getTitle() {
+        return null;
+    }
+
+    @Override
+    protected int getContentLayoutRes() {
+        return R.layout.fragment_home;
+    }
+
+    @Override
+    protected void initData() {
+        if (isHideFunction == null || !isHideFunction) {
+            initMenu();//初始化菜单
+        } else {
+            gvMain.setVisibility(View.GONE);
+        }
+        initRefreshLayout();
+        WeatherInfo weatherInfo = ACacheWrapper.getWeatherInfo();
+        showWeatherInfo(weatherInfo);
+    }
+
+    private void initRefreshLayout() {
+        blRefresh.setDelegate(this);
+        BGANormalRefreshViewHolder refreshViewHolder = new BGANormalRefreshViewHolder(getActivity(), false);// 设置下拉刷新和上拉加载更多的风格
+        blRefresh.setRefreshViewHolder(refreshViewHolder);// 设置下拉刷新和上拉加载更多的风格
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (isHideFunction == null) {
+            tvMotorLocation.setText(getString(R.string.bind_vehicle_first));
+        }
+        showProtectDays();//更新用户受保护天数
+    }
+
+    /**
+     * 展示用户受保护天数
+     */
+    private void showProtectDays() {
+        long registerDate = loginInfo.getRegisterDate();
+        if (registerDate == 0 || registerDate >= DateUtils.getCurrentTime()) {
+            tvProtectDays.setText("1");
+        } else {
+            Long registerTime = loginInfo.getRegisterDate();
+            long currentTime = System.currentTimeMillis();
+            int daysBetween = DateUtils.daysBetween(registerTime, currentTime, true);
+            tvProtectDays.setText(String.valueOf(daysBetween));
+        }
+    }
+
+    /**
+     * 展示天气信息
+     *
+     * @param weatherInfo
+     */
+    private void showWeatherInfo(WeatherInfo weatherInfo) {
+        if (weatherInfo != null) {
+            try {
+                tvCity.setText(String.format(getResources().getString(R.string.city), weatherInfo.getProvince(), weatherInfo.getCity()));
+                tvTemperature.setText(String.format(getResources().getString(R.string.temperature), Float.parseFloat(weatherInfo.getTemperature())));
+                tvPm25.setText(String.format(getResources().getString(R.string.pm25), weatherInfo.getPm25()));
+                Bitmap bitmap = BitmapFactory.decodeResource(getResources(), weatherInfo.getWeather().getWeatherDrawable());
+                ivWeather.setImageBitmap(bitmap);
+            } catch (Exception e) {
+                LogKit.exception("天气数据异常", "异常信息：\n" + e.toString());
+            }
+        }
+    }
+
+    /**
+     * 展示仪表盘数据
+     *
+     * @param vehicleLocationInfo
+     */
+    private void showVehicleInfo(VehicleLocationInfo vehicleLocationInfo) {
+        if (vehicleLocationInfo != null) {
+            tvMotorPStatus.setText(getString(Constants.P_STATUS_OPEN == vehicleLocationInfo.getPStatus() ? R.string.p_status_on : R.string.p_status_off));
+            try {
+                Float speed = Float.parseFloat(vehicleLocationInfo.getSpeed());
+                circleProgressBarLeft.setProgress(speed);
+                Float power = Float.parseFloat(vehicleLocationInfo.getPower());
+                circleProgressBarRight.setProgress(power);
+            } catch (NumberFormatException e) {
+                LogKit.exception("定位数据异常", "异常信息：\n" + e.toString());
+            }
+        }
+    }
+
+    /**
+     * 展示电动车定位地址
+     *
+     * @param reverseGeoCodeResult
+     */
+    private void showVehicleAddress(ReverseGeoCodeResult reverseGeoCodeResult) {
+        if (reverseGeoCodeResult != null) {
+            tvMotorLocation.setText(reverseGeoCodeResult.getAddress());
+        } else {
+            LogKit.exception("位置反向解析异常", "reverseGeoCodeResult：\n" + reverseGeoCodeResult.toString());
+        }
+    }
+
+    /**
+     * 展示最近一次轨迹信息
+     *
+     * @param vehicleContrailInfo
+     */
+    private void showVehicleLastContrail(VehicleContrailInfo vehicleContrailInfo) {
+
+        if (vehicleContrailInfo != null) {
+            try {
+                double mileageValue = vehicleContrailInfo.getTotalMileage();
+                String mileage = null;
+                if (mileageValue > 1000) {
+                    mileage = String.format(getString(R.string.mileage_k_base), mileageValue / 1000);
+                    tvMotorTotalMileageUnit.setText("KM");
+                } else {
+                    mileage = String.format(getString(R.string.mileage_base), mileageValue);
+                    tvMotorTotalMileageUnit.setText("M");
+                }
+
+                double minutesValue = DateUtils.millisecondsToMinutes(vehicleContrailInfo.getTotalTime());
+                String time = null;
+                if (minutesValue < 1) {
+                    time = getString(R.string.cycling_very_tiny);
+                } else if (minutesValue < 60) {
+                    time = String.format(getString(R.string.minute_unit), (int) Math.ceil(minutesValue));
+                } else {
+                    int hoursValue = (int) (minutesValue / 60);
+                    int surplusMinutesValue = (int) Math.ceil(minutesValue % 60);
+                    time = String.format(getString(R.string.hours_unit), hoursValue) + String.format(getString(R.string.minute_unit), surplusMinutesValue);
+                }
+                tvMotorTotalMileage.setText(mileage);
+                tvMotorTotalHours.setText(time);
+            } catch (Exception e) {
+                LogKit.exception("轨迹数据异常", "reverseGeoCodeResult：\n" + e.toString());
+            }
+        }
+    }
+
+    private void initMenu() {
+        List<MenuInfo> menuInfos = new ArrayList<>();
+        int count = TITLES.length;
+        for (int i = 0; i < count; i++) {
+            menuInfos.add(new MenuInfo(TITLES[i], ICONS[i]));
+        }
+        MenuAdapter adapter = new MenuAdapter(menuInfos, getActivity());
+        gvMain.setAdapter(adapter);
+        gvMain.setOnItemClickListener(this);
+    }
+
+    @Override
+    protected void handler(Message msg) {
+    }
+
+    @Override
+    public void onItemClick(AdapterView parent, View view, int position, long id) {
+        switch (position) {
+            case 0:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else if (isHideFunction) {
+                    CommonDialogFactory.createSimpleDialog(getActivity(), getString(R.string.no_this_function), Constants.SHOW_DIALOG_SHORT_TIME);
+                } else {
+                    homePageView.setViewBuffered(view);//防止按钮被重复点击
+                    TcpCmdWrapper
+                            .sendTcpCmd(TcpCmdEnum.声光寻车);
+                }
+                break;
+            case 1:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else if (isHideFunction) {
+                    CommonDialogFactory.createSimpleDialog(getActivity(), getString(R.string.no_this_function), Constants.SHOW_DIALOG_SHORT_TIME);
+                } else {
+                    startActivity(new Intent(getActivity(), VehicleControlActivity.class));
+                }
+                break;
+            case 2:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else if (isHideFunction) {
+                    CommonDialogFactory.createSimpleDialog(getActivity(), getString(R.string.no_this_function), Constants.SHOW_DIALOG_SHORT_TIME);
+                } else {
+                    startActivity(new Intent(getActivity(), VehicleSpeedLimitActivity.class));
+                }
+                break;
+            case 3:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else {
+                    startActivity(new Intent(getActivity(), ChargingOutletsActivity.class));
+                }
+                break;
+            case 4:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else if (isHideFunction) {
+                    CommonDialogFactory.createSimpleDialog(getActivity(), getString(R.string.no_this_function), Constants.SHOW_DIALOG_SHORT_TIME);
+                } else {
+                    startActivity(new Intent(getActivity(), VehicleCheckActivity.class));
+                }
+                break;
+            case 5:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else {
+                    startActivity(new Intent(getActivity(), RepairOutletsActivity.class));
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        EventBus.getDefault().unregister(this);//反注册EventBus
+    }
+
+    @OnClick({R.id.iv_head, R.id.ll_motor_tracking, R.id.ll_ridingRecord})
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.iv_head:
+//                intent = new Intent(getActivity(), PersonalActivity.class);
+//                startActivity(intent);
+                break;
+            case R.id.ll_motor_tracking:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else {
+                    startActivity(new Intent(getActivity(), VehicleTrackingActivity.class));
+                }
+                break;
+            case R.id.ll_ridingRecord:
+                if (isHideFunction == null) {
+                    CommonDialogFactory.createBindDialog(getActivity()).show();
+                } else {
+                    startActivity(new Intent(getActivity(), VehicleContrailActivity.class));
+                }
+                break;
+        }
+    }
+
+    @Override
+    public void onBGARefreshLayoutBeginRefreshing(final BGARefreshLayout refreshLayout) {
+        EventBus.getDefault().post(new UpdateDataEvent());
+        mHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                refreshLayout.endRefreshing();
+            }
+        }, 1000);
+    }
+
+    @Override
+    public boolean onBGARefreshLayoutBeginLoadingMore(BGARefreshLayout refreshLayout) {
+        return false;
+    }
+
+}
